@@ -36,7 +36,19 @@ public class ParseJava {
 
                         @Override
                         public void visit(ClassOrInterfaceDeclaration n, Void arg) {
-                            currentType = new Type(n.getNameAsString());
+
+                            String name = n.getNameAsString();
+                            final String[] packageName = {""};
+                            n.getFullyQualifiedName().ifPresent(new Consumer<String>() {
+                                @Override
+                                public void accept(String fullName) {
+                                    if(fullName.length() > name.length()) {
+                                        packageName[0] = fullName.substring(0, fullName.length() - (name.length() + 1));
+                                    }
+                                }
+                            });
+
+                            currentType = new Type(n.getNameAsString(), packageName[0]);
                             result.add(currentType);
                             super.visit(n, arg);
                         }

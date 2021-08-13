@@ -12,8 +12,11 @@ public class Type {
 
     private List<Field> fields;
 
-    public Type(String name) {
+    private String pkg;
+
+    public Type(String name, String pkg) {
         this.name = name;
+        this.pkg = pkg;
         this.fields = new ArrayList<>();
     }
 
@@ -27,5 +30,9 @@ public class Type {
 
     public void addField(Field field) {
         fields.add(field);
+    }
+
+    public String getPkg() {
+        return pkg;
     }
 }

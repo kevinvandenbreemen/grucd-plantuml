@@ -28,4 +28,10 @@ class JavaParserTest {
         fields[0].typeName shouldBeEqualTo "int"
     }
 
+    @Test
+    fun `should be able to determine the package of a new class`() {
+        val types = ParseJava().parse("src/test/resources/pkg/test/PackageTest.java")
+        types[0].pkg shouldBeEqualTo "pkg.test"
+    }
+
 }
