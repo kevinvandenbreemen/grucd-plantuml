@@ -3,8 +3,12 @@ package com.vandenbreemen.grucd.parse;
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ParseResult;
 import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.Modifier;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
+import com.github.javaparser.ast.body.FieldDeclaration;
+import com.github.javaparser.ast.body.VariableDeclarator;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
+import com.vandenbreemen.grucd.model.Field;
 import com.vandenbreemen.grucd.model.Type;
 
 import java.io.File;
@@ -22,13 +26,29 @@ public class ParseJava {
 
             List<Type> result = new ArrayList<>();
 
-            unit.getResult().ifPresent(new Consumer<CompilationUnit>() {
+
+            unit.getResult().ifPresent(new Consumer<>() {
                 @Override
                 public void accept(CompilationUnit unit) {
                     unit.accept(new VoidVisitorAdapter<Void>() {
+
+                        private Type currentType;
+
                         @Override
                         public void visit(ClassOrInterfaceDeclaration n, Void arg) {
-                            result.add(new Type(n.getNameAsString()));
+                            currentType = new Type(n.getNameAsString());
+                            result.add(currentType);
+                            super.visit(n, arg);
+                        }
+
+                        @Override
+                        public void visit(FieldDeclaration n, Void arg) {
+                            if(n.getModifiers().contains(Modifier.publicModifier())) {
+                                for (VariableDeclarator dec : n.getVariables()) {
+                                    Field field = new Field(dec.getName().asString(), dec.getTypeAsString());
+                                    currentType.addField(field);
+                                }
+                            }
                         }
                     }, null);
                 }
