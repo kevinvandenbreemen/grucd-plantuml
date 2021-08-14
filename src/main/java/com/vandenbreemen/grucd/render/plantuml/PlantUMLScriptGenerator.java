@@ -1,10 +1,8 @@
 package com.vandenbreemen.grucd.render.plantuml;
 
-import com.vandenbreemen.grucd.model.Field;
-import com.vandenbreemen.grucd.model.Method;
-import com.vandenbreemen.grucd.model.Parameter;
-import com.vandenbreemen.grucd.model.Type;
+import com.vandenbreemen.grucd.model.*;
 import com.vandenbreemen.grucd.util.TabbedWriter;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Consumer;
 
@@ -45,4 +43,26 @@ public class PlantUMLScriptGenerator {
         return writer.toString();
     }
 
+    @NotNull
+    public String render(@NotNull Model model) {
+        StringBuilder script = new StringBuilder();
+        model.getTypes().forEach(type->{
+            script.append(renderType(type)).append("\n");
+        });
+
+        model.getRelations().forEach(relation->{
+
+            String relationshipOperator = null;
+
+            if(relation.getType() == RelationType.encapsulates) {
+                relationshipOperator = "o-->";
+            }
+
+            if(relationshipOperator != null) {
+                script.append(relation.getFrom().getName()).append(" ").append(relationshipOperator).append(" ").append(relation.getTo().getName()).append("\n");
+            }
+        });
+
+        return script.toString();
+    }
 }

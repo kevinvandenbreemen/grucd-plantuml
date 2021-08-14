@@ -1,3 +1,4 @@
+import com.vandenbreemen.grucd.builder.ModelBuilder
 import com.vandenbreemen.grucd.model.Field
 import com.vandenbreemen.grucd.model.Method
 import com.vandenbreemen.grucd.model.Parameter
@@ -47,6 +48,25 @@ class PlantUMLScriptGeneratorTest {
         println(result)
 
         result.shouldContain("+ getData(argument: Int, test: boolean): String")
+    }
+
+    @Test
+    fun `should generate diagram with a encapsulation in it`() {
+        val type = Type("TestClass", "com.test.types")
+        type.addField(Field("myString", "String"))
+        val method = Method("getData", "String")
+        method.addParameter(Parameter("argument", "Int"))
+        method.addParameter(Parameter("test", "boolean"))
+        type.addMethod(method)
+
+        val container = Type("ContainingClass", "com.test.types")
+        container.addField(Field("test", "TestClass"))
+
+        val model = ModelBuilder().build(listOf(type, container))
+        val script = PlantUMLScriptGenerator().render(model)
+        println(script)
+
+        script.shouldContain("ContainingClass o--> TestClass")
     }
 
 }
