@@ -34,4 +34,23 @@ class JavaParserTest {
         types[0].pkg shouldBeEqualTo "pkg.test"
     }
 
+    @Test
+    fun `should include methods on the class`() {
+        val types = ParseJava().parse("src/test/resources/TestJava.java")
+        val type = types[0]
+        val methods = type.methods
+
+        methods.shouldNotBeNull()
+
+        methods.forEach { m->println(m.name) }
+
+        methods.size shouldBeEqualTo 3
+
+        methods[0].name shouldBeEqualTo "getPrivateInt"
+        methods[0].returnType shouldBeEqualTo "int"
+
+        methods[1].name shouldBeEqualTo "engagePrimaryInterlock"
+        methods[1].returnType shouldBeEqualTo "void"
+    }
+
 }

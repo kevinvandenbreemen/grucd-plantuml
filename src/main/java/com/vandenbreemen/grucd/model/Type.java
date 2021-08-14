@@ -12,12 +12,15 @@ public class Type {
 
     private List<Field> fields;
 
+    private List<Method> methods;
+
     private String pkg;
 
     public Type(String name, String pkg) {
         this.name = name;
         this.pkg = pkg;
         this.fields = new ArrayList<>();
+        this.methods = new ArrayList<>();
     }
 
     public String getName() {
@@ -30,6 +33,14 @@ public class Type {
 
     public void addField(Field field) {
         fields.add(field);
+    }
+
+    public void addMethod(Method method) {
+        this.methods.add(method);
+    }
+
+    public List<Method> getMethods() {
+        return methods;
     }
 
     public String getPkg() {

@@ -6,9 +6,11 @@ import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Modifier;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.FieldDeclaration;
+import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.VariableDeclarator;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 import com.vandenbreemen.grucd.model.Field;
+import com.vandenbreemen.grucd.model.Method;
 import com.vandenbreemen.grucd.model.Type;
 import org.apache.log4j.Logger;
 
@@ -67,6 +69,13 @@ public class ParseJava {
                                     currentType.addField(field);
                                 }
                             }
+                        }
+
+                        @Override
+                        public void visit(MethodDeclaration n, Void arg) {
+                            super.visit(n, arg);
+                            Method method = new Method(n.getNameAsString(), n.getTypeAsString());
+                            currentType.addMethod(method);
                         }
                     }, null);
                 }
