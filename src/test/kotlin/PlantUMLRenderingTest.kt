@@ -11,7 +11,7 @@ class PlantUMLRenderingTest {
             }
         """.trimIndent()
 
-        PlantUMLRenderer().render(classDiagram)
+        println(PlantUMLRenderer().renderSVG(classDiagram))
     }
 
 }

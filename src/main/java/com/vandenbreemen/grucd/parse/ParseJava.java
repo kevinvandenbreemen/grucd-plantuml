@@ -10,6 +10,7 @@ import com.github.javaparser.ast.body.VariableDeclarator;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 import com.vandenbreemen.grucd.model.Field;
 import com.vandenbreemen.grucd.model.Type;
+import org.apache.log4j.Logger;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -19,7 +20,12 @@ import java.util.function.Consumer;
 
 public class ParseJava {
 
+    private static final Logger logger = Logger.getLogger(ParseJava.class);
+
     public List<Type> parse(String filePath) {
+
+        logger.debug("Parsing " + filePath);
+
         try {
             JavaParser parser = new JavaParser();
             ParseResult<CompilationUnit> unit = parser.parse(new File(filePath));

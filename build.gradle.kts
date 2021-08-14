@@ -23,6 +23,9 @@ dependencies {
 
     val plantUmlVersion = "1.0.39"
     implementation("com.credibledoc:plantuml-core:$plantUmlVersion")
+
+    val log4jVersion = "1.2.14"
+    implementation("log4j:log4j:$log4jVersion")
 }
 
 tasks.getByName<Test>("test") {
