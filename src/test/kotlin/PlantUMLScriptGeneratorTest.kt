@@ -34,4 +34,19 @@ class PlantUMLScriptGeneratorTest {
         result.shouldContain("+ getData(argument: Int): String")
     }
 
+    @Test
+    fun `should comma separate method args`() {
+        val type = Type("TestClass", "com.test.types")
+        type.addField(Field("myString", "String"))
+        val method = Method("getData", "String")
+        method.addParameter(Parameter("argument", "Int"))
+        method.addParameter(Parameter("test", "boolean"))
+        type.addMethod(method)
+
+        val result = PlantUMLScriptGenerator().renderType(type)
+        println(result)
+
+        result.shouldContain("+ getData(argument: Int, test: boolean): String")
+    }
+
 }

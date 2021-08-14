@@ -29,10 +29,15 @@ public class PlantUMLScriptGenerator {
                 method.getParameters().forEach(new Consumer<Parameter>() {
                     @Override
                     public void accept(Parameter parameter) {
-                        parmsBuilder.append(parameter.getName()).append(": ").append(parameter.getTypeName());
+                        parmsBuilder.append(parameter.getName()).append(": ").append(parameter.getTypeName()).append(", ");
                     }
                 });
-                writer.println("+ "+method.getName() + "("+parmsBuilder.toString()+"): "+ method.getReturnType());
+
+                String parms = parmsBuilder.toString();
+                if(parms.endsWith(", ")) {
+                    parms = parms.substring(0, parms.length()-", ".length());
+                }
+                writer.println("+ "+method.getName() + "("+parms+"): "+ method.getReturnType());
             }
         });
         writer.unTab().println("}");
