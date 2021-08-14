@@ -7,7 +7,7 @@ public class TestJava {
         return privateInt;
     }
 
-    public void engagePrimaryInterlock() {}
+    public void engagePrimaryInterlock(String parameter, int[] arguments) {}
 
     public void setPrivateInt(int privateInt) {
         this.privateInt = privateInt;

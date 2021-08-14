@@ -53,4 +53,19 @@ class JavaParserTest {
         methods[1].returnType shouldBeEqualTo "void"
     }
 
+    @Test
+    fun `should include method arguments in methods`() {
+        val types = ParseJava().parse("src/test/resources/TestJava.java")
+        val type = types[0]
+        val methods = type.methods
+
+        methods[1].name shouldBeEqualTo "engagePrimaryInterlock"
+        methods[1].returnType shouldBeEqualTo "void"
+        methods[1].parameters.shouldNotBeNull()
+        methods[1].parameters[0].name shouldBeEqualTo "parameter"
+        methods[1].parameters[1].name shouldBeEqualTo "arguments"
+        methods[1].parameters[0].typeName shouldBeEqualTo "String"
+        methods[1].parameters[1].typeName shouldBeEqualTo "int[]"
+    }
+
 }

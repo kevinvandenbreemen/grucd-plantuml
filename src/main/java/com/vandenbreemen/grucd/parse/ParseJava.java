@@ -11,8 +11,10 @@ import com.github.javaparser.ast.body.VariableDeclarator;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 import com.vandenbreemen.grucd.model.Field;
 import com.vandenbreemen.grucd.model.Method;
+import com.vandenbreemen.grucd.model.Parameter;
 import com.vandenbreemen.grucd.model.Type;
 import org.apache.log4j.Logger;
+import org.apache.log4j.NDC;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -45,6 +47,10 @@ public class ParseJava {
                         @Override
                         public void visit(ClassOrInterfaceDeclaration n, Void arg) {
 
+                            if(currentType != null) {
+                                NDC.pop();
+                            }
+
                             String name = n.getNameAsString();
                             final String[] packageName = {""};
                             n.getFullyQualifiedName().ifPresent(new Consumer<String>() {
@@ -57,6 +63,7 @@ public class ParseJava {
                             });
 
                             currentType = new Type(n.getNameAsString(), packageName[0]);
+                            NDC.push(currentType.getName());
                             result.add(currentType);
                             super.visit(n, arg);
                         }
@@ -74,7 +81,16 @@ public class ParseJava {
                         @Override
                         public void visit(MethodDeclaration n, Void arg) {
                             super.visit(n, arg);
+
                             Method method = new Method(n.getNameAsString(), n.getTypeAsString());
+
+                            logger.trace("mthd:  "+method.getName()+ ": "+method.getReturnType());
+
+                            n.getParameters().forEach(p->{
+                                logger.trace("parm "+p.getNameAsString());
+                                method.addParameter(new Parameter(p.getNameAsString(), p.getTypeAsString()));
+                            });
+
                             currentType.addMethod(method);
                         }
                     }, null);
@@ -85,6 +101,8 @@ public class ParseJava {
 
         } catch (FileNotFoundException fex) {
 
+        } finally {
+            NDC.pop();
         }
 
         return null;
