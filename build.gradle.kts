@@ -20,6 +20,9 @@ dependencies {
 
     val kluentVersion = "1.68"
     testImplementation("org.amshove.kluent:kluent:$kluentVersion")
+
+    val plantUmlVersion = "1.0.39"
+    implementation("com.credibledoc:plantuml-core:$plantUmlVersion")
 }
 
 tasks.getByName<Test>("test") {
