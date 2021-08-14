@@ -9,6 +9,10 @@ public class TestJava {
 
     public void engagePrimaryInterlock(String parameter, int[] arguments) {}
 
+    private void doSomeStuff() {
+
+    }
+
     public void setPrivateInt(int privateInt) {
         this.privateInt = privateInt;
     }

@@ -68,4 +68,13 @@ class JavaParserTest {
         methods[1].parameters[1].typeName shouldBeEqualTo "int[]"
     }
 
+    @Test
+    fun `should not include private methods`() {
+        val types = ParseJava().parse("src/test/resources/TestJava.java")
+        val type = types[0]
+        val methods = type.methods
+
+        methods.size shouldBeEqualTo 3
+    }
+
 }

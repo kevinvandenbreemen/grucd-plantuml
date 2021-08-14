@@ -82,6 +82,10 @@ public class ParseJava {
                         public void visit(MethodDeclaration n, Void arg) {
                             super.visit(n, arg);
 
+                            if(!n.hasModifier(Modifier.publicModifier().getKeyword())) {
+                                return;
+                            }
+
                             Method method = new Method(n.getNameAsString(), n.getTypeAsString());
 
                             logger.trace("mthd:  "+method.getName()+ ": "+method.getReturnType());
