@@ -1,3 +1,5 @@
+import com.vandenbreemen.grucd.builder.ModelBuilder
+import com.vandenbreemen.grucd.model.RelationType
 import com.vandenbreemen.grucd.parse.ParseJava
 import org.amshove.kluent.shouldBeEqualTo
 import org.amshove.kluent.shouldNotBeEmpty
@@ -75,6 +77,22 @@ class JavaParserTest {
         val methods = type.methods
 
         methods.size shouldBeEqualTo 3
+    }
+
+    @Test
+    fun `should recognized encapsulated object`() {
+        val types = ParseJava().parse("src/test/resources/encapsulation.test/Encapsulation.java")
+        types.size shouldBeEqualTo 2
+
+        val builder = ModelBuilder()
+        val model = builder.build(types)
+
+        println(model.relations[0])
+
+        model.relations.shouldNotBeEmpty()
+        model.relations[0].from shouldBeEqualTo model.types[0]
+        model.relations[0].to shouldBeEqualTo model.types[1]
+        model.relations[0].type shouldBeEqualTo RelationType.encapsulates
     }
 
 }

@@ -46,4 +46,14 @@ public class Type {
     public String getPkg() {
         return pkg;
     }
+
+    @Override
+    public String toString() {
+        return "Type{" +
+                "name='" + name + '\'' +
+                ", fields=" + fields +
+                ", methods=" + methods +
+                ", pkg='" + pkg + '\'' +
+                '}';
+    }
 }

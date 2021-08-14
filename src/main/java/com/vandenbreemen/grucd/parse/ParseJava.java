@@ -104,7 +104,7 @@ public class ParseJava {
             return result;
 
         } catch (FileNotFoundException fex) {
-
+            logger.error("Failed to parse", fex);
         } finally {
             NDC.pop();
         }
