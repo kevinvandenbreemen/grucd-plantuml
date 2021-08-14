@@ -4,7 +4,7 @@ import com.vandenbreemen.grucd.model.Type;
 import com.vandenbreemen.grucd.parse.ParseJava;
 import com.vandenbreemen.grucd.render.plantuml.PlantUMLRenderer;
 import com.vandenbreemen.grucd.render.plantuml.PlantUMLScriptGenerator;
-import com.vandenbreemen.grucd.util.CommandLineParameters;
+import com.vandenbreemen.kevincommon.cmd.CommandLineParameters;
 
 import java.io.FileWriter;
 import java.io.IOException;

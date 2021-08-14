@@ -8,6 +8,7 @@ version = "1.0-SNAPSHOT"
 
 repositories {
     mavenCentral()
+    maven { setUrl("https://jitpack.io") }
 }
 
 dependencies {
@@ -26,6 +27,9 @@ dependencies {
 
     val log4jVersion = "1.2.14"
     implementation("log4j:log4j:$log4jVersion")
+
+    val kevinCommonVersion = "1.0.4"
+    implementation("com.github.kevinvandenbreemen:kevin-common:$kevinCommonVersion")
 }
 
 tasks.getByName<Test>("test") {
