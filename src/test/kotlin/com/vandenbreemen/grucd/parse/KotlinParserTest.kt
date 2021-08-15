@@ -35,6 +35,16 @@ internal class KotlinParserTest {
     }
 
     @Test
+    fun `should parse class attributes`() {
+        val types = ParseKotlin().parse("src/test/resources/kotlin/KotlinClass.kt")
+        val fields = types[0].fields
+        fields.shouldNotBeEmpty()
+
+        fields[0].name shouldBeEqualTo "name"
+        fields[0].typeName shouldBeEqualTo "String"
+    }
+
+    @Test
     fun `learning test to parse Kotlin with kotlinx dot ast`() {
 
 
