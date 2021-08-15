@@ -30,6 +30,11 @@ dependencies {
 
     val kevinCommonVersion = "1.0.4"
     implementation("com.github.kevinvandenbreemen:kevin-common:$kevinCommonVersion")
+
+    val kotlinParserVersion = "bf1da05656"
+    implementation("com.github.kotlinx.ast:common:$kotlinParserVersion")
+    implementation("com.github.kotlinx.ast:grammar-kotlin-parser-antlr-kotlin:$kotlinParserVersion")
+
 }
 
 tasks.getByName<Test>("test") {
