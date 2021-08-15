@@ -74,6 +74,52 @@ internal class KotlinParserTest {
     }
 
     @Test
+    fun `should parse method on a class`() {
+        val types = ParseKotlin().parse("src/test/resources/kotlin/KotlinClass.kt")
+        val type = types[0]
+
+        type.methods.shouldNotBeEmpty()
+        val method = type.methods[0]
+        method.name shouldBeEqualTo "requireParams"
+        method.returnType shouldBeEqualTo ""
+    }
+
+    @Test
+    fun `should parse method with a return type on a class`() {
+        val types = ParseKotlin().parse("src/test/resources/kotlin/KotlinClass.kt")
+        val type = types[0]
+
+        type.methods.shouldNotBeEmpty()
+        val method = type.methods[1]
+        method.name shouldBeEqualTo "getSystemData"
+        method.returnType shouldBeEqualTo "List<String>"
+    }
+
+    @Test
+    fun `should parse parameter types of a method`() {
+        val types = ParseKotlin().parse("src/test/resources/kotlin/KotlinClass.kt")
+        val type = types[0]
+
+        type.methods.shouldNotBeEmpty()
+        val method = type.methods[1]
+        method.parameters.size shouldBeEqualTo 2
+
+        method.parameters[0].name shouldBeEqualTo "param1"
+        method.parameters[0].typeName shouldBeEqualTo "String"
+
+        method.parameters[1].name shouldBeEqualTo "matrix"
+        method.parameters[1].typeName shouldBeEqualTo "Int"
+    }
+
+    @Test
+    fun `should not parse private methods`() {
+        val types = ParseKotlin().parse("src/test/resources/kotlin/KotlinClass.kt")
+        val type = types[0]
+
+        type.methods.size shouldBeEqualTo 2
+    }
+
+    @Test
     fun `learning test to parse Kotlin with kotlinx dot ast`() {
 
 
