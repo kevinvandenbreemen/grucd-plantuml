@@ -9,10 +9,7 @@ import com.github.javaparser.ast.body.FieldDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.VariableDeclarator;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
-import com.vandenbreemen.grucd.model.Field;
-import com.vandenbreemen.grucd.model.Method;
-import com.vandenbreemen.grucd.model.Parameter;
-import com.vandenbreemen.grucd.model.Type;
+import com.vandenbreemen.grucd.model.*;
 import org.apache.log4j.Logger;
 import org.apache.log4j.NDC;
 
@@ -70,11 +67,15 @@ public class ParseJava {
 
                         @Override
                         public void visit(FieldDeclaration n, Void arg) {
-                            if(n.getModifiers().contains(Modifier.publicModifier())) {
-                                for (VariableDeclarator dec : n.getVariables()) {
-                                    Field field = new Field(dec.getName().asString(), dec.getTypeAsString());
-                                    currentType.addField(field);
+                            for (VariableDeclarator dec : n.getVariables()) {
+                                Visibility visibility;
+                                if(n.hasModifier(Modifier.publicModifier().getKeyword())){
+                                    visibility = Visibility.Public;
+                                } else {
+                                    visibility = Visibility.Private;
                                 }
+                                Field field = new Field(dec.getName().asString(), dec.getTypeAsString(), visibility);
+                                currentType.addField(field);
                             }
                         }
 

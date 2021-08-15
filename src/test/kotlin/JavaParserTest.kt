@@ -1,5 +1,6 @@
 import com.vandenbreemen.grucd.builder.ModelBuilder
 import com.vandenbreemen.grucd.model.RelationType
+import com.vandenbreemen.grucd.model.Visibility
 import com.vandenbreemen.grucd.parse.ParseJava
 import org.amshove.kluent.shouldBeEqualTo
 import org.amshove.kluent.shouldNotBeEmpty
@@ -25,9 +26,22 @@ class JavaParserTest {
 
         fields.shouldNotBeNull()
 
-        fields.size shouldBeEqualTo 1
+        fields.size shouldBeEqualTo 2
         fields[0].name shouldBeEqualTo "publicInt"
         fields[0].typeName shouldBeEqualTo "int"
+        fields[0].visibility shouldBeEqualTo Visibility.Public
+    }
+
+    @Test
+    fun `should parse private java fields`() {
+        val types = ParseJava().parse("src/test/resources/TestJava.java")
+        val type = types[0]
+        val fields = type.fields
+
+        fields.size shouldBeEqualTo 2
+        fields[1].name shouldBeEqualTo "privateInt"
+        fields[1].visibility shouldBeEqualTo Visibility.Private
+
     }
 
     @Test
