@@ -22,7 +22,20 @@ public class PlantUMLScriptGenerator {
 
     public String renderType(Type type) {
         TabbedWriter writer = new TabbedWriter();
-        writer.println("class " + type.getName() + " {").tab();
+
+        String typeName;
+        switch (type.getType()) {
+            case Interface:
+                typeName = "interface";
+                break;
+            case Enum:
+                typeName = "enum";
+                break;
+            default:
+                typeName = "class";
+        }
+
+        writer.println(typeName + " " + type.getName() + " {").tab();
         type.getFields().forEach(new Consumer<Field>() {
             @Override
             public void accept(Field field) {

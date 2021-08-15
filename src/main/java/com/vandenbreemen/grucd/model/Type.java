@@ -16,11 +16,18 @@ public class Type {
 
     private String pkg;
 
-    public Type(String name, String pkg) {
+    private TypeType type;
+
+    public Type(String name, String pkg, TypeType type) {
         this.name = name;
         this.pkg = pkg;
+        this.type = type;
         this.fields = new ArrayList<>();
         this.methods = new ArrayList<>();
+    }
+
+    public Type(String name, String pkg) {
+        this(name, pkg, TypeType.Class);
     }
 
     public String getName() {
@@ -45,6 +52,10 @@ public class Type {
 
     public String getPkg() {
         return pkg;
+    }
+
+    public TypeType getType() {
+        return type;
     }
 
     @Override

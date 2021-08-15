@@ -4,12 +4,10 @@ import com.github.javaparser.JavaParser;
 import com.github.javaparser.ParseResult;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Modifier;
-import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
-import com.github.javaparser.ast.body.FieldDeclaration;
-import com.github.javaparser.ast.body.MethodDeclaration;
-import com.github.javaparser.ast.body.VariableDeclarator;
+import com.github.javaparser.ast.body.*;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
+import com.vandenbreemen.grucd.model.Parameter;
 import com.vandenbreemen.grucd.model.*;
 import org.apache.log4j.Logger;
 import org.apache.log4j.NDC;
@@ -60,9 +58,41 @@ public class ParseJava {
                                 }
                             });
 
-                            currentType = new Type(n.getNameAsString(), packageName[0]);
+                            currentType = new Type(n.getNameAsString(), packageName[0], n.isInterface() ? TypeType.Interface : TypeType.Class);
                             NDC.push(currentType.getName());
                             result.add(currentType);
+                            super.visit(n, arg);
+                        }
+
+                        @Override
+                        public void visit(EnumDeclaration n, Void arg) {
+
+                            if(currentType != null) {
+                                NDC.pop();
+                            }
+
+                            String name = n.getNameAsString();
+                            final String[] packageName = {""};
+                            n.getFullyQualifiedName().ifPresent(new Consumer<String>() {
+                                @Override
+                                public void accept(String fullName) {
+                                    if(fullName.length() > name.length()) {
+                                        packageName[0] = fullName.substring(0, fullName.length() - (name.length() + 1));
+                                    }
+                                }
+                            });
+
+                            currentType = new Type(n.getNameAsString(), packageName[0], TypeType.Enum);
+                            NDC.push(currentType.getName());
+                            result.add(currentType);
+                            super.visit(n, arg);
+                        }
+
+                        @Override
+                        public void visit(EnumConstantDeclaration n, Void arg) {
+
+                            currentType.addField(new Field(n.getNameAsString(), currentType.getName(), Visibility.Public));
+
                             super.visit(n, arg);
                         }
 

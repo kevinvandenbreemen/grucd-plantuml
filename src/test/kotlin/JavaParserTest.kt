@@ -127,4 +127,10 @@ class JavaParserTest {
         model.relations[0].type shouldBeEqualTo RelationType.encapsulates
     }
 
+    @Test
+    fun `should parse enumerations`() {
+        val types = ParseJava().parse("src/test/resources/enum/Enum.java")
+        types.size shouldBeEqualTo 2
+    }
+
 }
