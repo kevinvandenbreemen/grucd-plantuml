@@ -4,10 +4,12 @@ import com.vandenbreemen.grucd.model.*
 import kotlinx.ast.common.AstSource
 import kotlinx.ast.common.ast.DefaultAstNode
 import kotlinx.ast.common.klass.KlassDeclaration
+import kotlinx.ast.common.klass.KlassIdentifier
 import kotlinx.ast.grammar.kotlin.common.summary
 import kotlinx.ast.grammar.kotlin.common.summary.PackageHeader
 import kotlinx.ast.grammar.kotlin.target.antlr.kotlin.KotlinGrammarAntlrKotlinParser
 import org.apache.log4j.Logger
+import org.apache.log4j.NDC
 
 class ParseKotlin {
 
@@ -44,56 +46,64 @@ class ParseKotlin {
     private fun handleClassDeclaration(declaration: KlassDeclaration, type: Type, classList: MutableList<Type>) {
 
         logger.debug("Parsing class ${type.name}...")
+        NDC.push(type.name)
 
-        declaration.children.forEach { child->
-            (child as? KlassDeclaration)?.let { kd->
-                kd.parameter.forEach { parm->
-                    processPropertyDeclaration(parm, type)
+        try {
+            declaration.children.forEach { child ->
+                (child as? KlassDeclaration)?.let { kd ->
+                    kd.parameter.forEach { parm ->
+                        processPropertyDeclaration(parm, type)
+                    }
                 }
-            }
-            (child as? DefaultAstNode)?.let { node->
-                node.children.forEach {
-                    (it as? KlassDeclaration)?.let { declaration->
-                        if(declaration.keyword == "val" || declaration.keyword == "var") {
-                            processPropertyDeclaration(declaration, type)
-                        }
-                        else if(declaration.keyword == "fun") {
+                (child as? DefaultAstNode)?.let { node ->
+                    node.children.forEach {
+                        (it as? KlassDeclaration)?.let { declaration ->
+                            if (declaration.keyword == "val" || declaration.keyword == "var") {
+                                processPropertyDeclaration(declaration, type)
+                            } else if (declaration.keyword == "fun") {
 
-                            val modifier = getVisibilityModifier(declaration)
+                                logger.debug("fun ${declaration.identifier}")
+                                val modifier = getVisibilityModifier(declaration)
 
-                            if(modifier == Visibility.Public) {
+                                if (modifier == Visibility.Public) {
 
-                                val name = declaration.identifier?.rawName ?: ""
+                                    val name = declaration.identifier?.rawName ?: ""
 
 
-                                val returnType = if (declaration.type.isEmpty()) {
-                                    ""
-                                } else {
-                                    declaration.type[0].rawName
-                                }
-
-                                val method = Method(name, returnType)
-                                declaration.parameter.forEach { methodParam ->
-                                    val parmType = methodParam.type[0].rawName
-                                    methodParam.identifier?.let { parameterName ->
-                                        method.addParameter(Parameter(parameterName.rawName, parmType))
+                                    val returnType = if (declaration.type.isEmpty()) {
+                                        ""
+                                    } else {
+                                        declaration.type[0].rawName
                                     }
-                                }
 
-                                type.addMethod(method)
-                            }
-                        }
-                        else if(declaration.keyword == "class") {
-                            logger.debug("Found nested class ${declaration.identifier?.rawName}")
-                            declaration.identifier?.rawName?.let { nestedTypeName->
-                                val nestedType = Type(nestedTypeName, type.pkg)
-                                handleClassDeclaration(declaration, nestedType, classList)
-                                classList.add(nestedType)
+                                    val method = Method(name, returnType)
+                                    declaration.parameter.forEach { methodParam ->
+                                        val parmType = if(methodParam.type.isNotEmpty()) { methodParam.type[0].rawName } else {
+                                            methodParam.children.firstOrNull { it-> it is KlassIdentifier }?.let { kid -> (kid as? KlassIdentifier)?.let {
+                                                it.identifier
+                                            }} ?: ""
+                                        }
+                                        methodParam.identifier?.let { parameterName ->
+                                            method.addParameter(Parameter(parameterName.rawName, parmType))
+                                        }
+                                    }
+
+                                    type.addMethod(method)
+                                }
+                            } else if (declaration.keyword == "class") {
+                                logger.debug("Found nested class ${declaration.identifier?.rawName}")
+                                declaration.identifier?.rawName?.let { nestedTypeName ->
+                                    val nestedType = Type(nestedTypeName, type.pkg)
+                                    handleClassDeclaration(declaration, nestedType, classList)
+                                    classList.add(nestedType)
+                                }
                             }
                         }
                     }
                 }
             }
+        } finally {
+            NDC.pop()
         }
     }
 
@@ -102,7 +112,16 @@ class ParseKotlin {
         type: Type
     ) {
         val name = declaration.identifier?.rawName ?: ""
-        val parmType = declaration.type[0].rawName
+
+        logger.debug("prop dec $name, type=${declaration.type}")
+        val parmType = if(declaration.type.isEmpty()) {
+            declaration.children.firstOrNull { it-> it is KlassIdentifier } ?.let { ident->
+                (ident as? KlassIdentifier)?.let { klassIdentifier ->
+                    klassIdentifier.identifier
+                }
+            } ?: ""
+        } else declaration.type[0].rawName
+
         val modifier = getVisibilityModifier(declaration)
 
         type.addField(Field(name, parmType, modifier))
