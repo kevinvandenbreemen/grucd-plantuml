@@ -67,6 +67,10 @@ internal class KotlinParserTest {
         fields[0].typeName shouldBeEqualTo "String"
         fields[0].visibility shouldBeEqualTo Visibility.Private
 
+        fields[1].name shouldBeEqualTo "hiddenVariableName"
+        fields[1].typeName shouldBeEqualTo "String"
+        fields[1].visibility shouldBeEqualTo Visibility.Private
+
     }
 
     @Test

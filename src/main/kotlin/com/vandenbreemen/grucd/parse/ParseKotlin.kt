@@ -42,39 +42,40 @@ class ParseKotlin {
         declaration.children.forEach { child->
             (child as? KlassDeclaration)?.let { kd->
                 kd.parameter.forEach { parm->
-
-                    val name = parm.identifier?.rawName ?: ""
-                    val parmType = parm.type[0].rawName
-                    val modifier = if(parm.modifiers.isEmpty() ) { "public" } else {parm.modifiers[0].modifier}
-
-                    val visibility: Visibility = when(modifier) {
-                        "private" -> Visibility.Private
-                        else -> Visibility.Public
-                    }
-
-                    type.addField(Field(name, parmType, visibility))
+                    processPropertyDeclaration(parm, type)
                 }
             }
             (child as? DefaultAstNode)?.let { node->
                 node.children.forEach {
                     println(it)
                     (it as? KlassDeclaration)?.let { declaration->
-                        if(declaration.keyword == "val") {
-                            val name = declaration.identifier?.rawName ?: ""
-                            val parmType = declaration.type[0].rawName
-                            val modifier = if(declaration.modifiers.isEmpty() ) { "public" } else {declaration.modifiers[0].modifier}
-
-                            val visibility: Visibility = when(modifier) {
-                                "private" -> Visibility.Private
-                                else -> Visibility.Public
-                            }
-
-                            type.addField(Field(name, parmType, visibility))
+                        if(declaration.keyword == "val" || declaration.keyword == "var") {
+                            processPropertyDeclaration(declaration, type)
                         }
                     }
                 }
             }
         }
+    }
+
+    private fun processPropertyDeclaration(
+        declaration: KlassDeclaration,
+        type: Type
+    ) {
+        val name = declaration.identifier?.rawName ?: ""
+        val parmType = declaration.type[0].rawName
+        val modifier = if (declaration.modifiers.isEmpty()) {
+            "public"
+        } else {
+            declaration.modifiers[0].modifier
+        }
+
+        val visibility: Visibility = when (modifier) {
+            "private" -> Visibility.Private
+            else -> Visibility.Public
+        }
+
+        type.addField(Field(name, parmType, visibility))
     }
 
 }
