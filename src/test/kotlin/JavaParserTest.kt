@@ -109,4 +109,22 @@ class JavaParserTest {
         model.relations[0].type shouldBeEqualTo RelationType.encapsulates
     }
 
+    @Test
+    fun `should recognized encapsulated list of objects`() {
+        val types = ParseJava().parse("src/test/resources/encapsulation.test/ListEncapsulationTest.java")
+        types.size shouldBeEqualTo 2
+
+        types[0].fields[0].typeArguments.shouldNotBeEmpty()
+
+        val builder = ModelBuilder()
+        val model = builder.build(types)
+
+        println(model.relations[0])
+
+        model.relations.shouldNotBeEmpty()
+        model.relations[0].from shouldBeEqualTo model.types[0]
+        model.relations[0].to shouldBeEqualTo model.types[1]
+        model.relations[0].type shouldBeEqualTo RelationType.encapsulates
+    }
+
 }

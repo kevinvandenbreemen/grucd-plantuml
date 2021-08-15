@@ -8,6 +8,7 @@ import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.FieldDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.VariableDeclarator;
+import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 import com.vandenbreemen.grucd.model.*;
 import org.apache.log4j.Logger;
@@ -75,6 +76,15 @@ public class ParseJava {
                                     visibility = Visibility.Private;
                                 }
                                 Field field = new Field(dec.getName().asString(), dec.getTypeAsString(), visibility);
+
+                                if(dec.getType() instanceof ClassOrInterfaceType) {
+                                    ((ClassOrInterfaceType) dec.getType()).getTypeArguments().ifPresent(arguments->{
+                                        arguments.forEach(type -> {
+                                            field.addTypeArgument(type.getElementType().asString());
+                                        });
+                                    });
+                                }
+
                                 currentType.addField(field);
                             }
                         }

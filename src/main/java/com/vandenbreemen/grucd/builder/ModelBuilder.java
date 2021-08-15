@@ -15,16 +15,22 @@ public class ModelBuilder {
     public Model build(List<Type> types) {
         Model model = new Model(types);
 
-        Map<Type, AbstractList<Type>> encapsulations = new HashMap<>();
+        Map<Type, AbstractSet<Type>> encapsulations = new HashMap<>();
         types.forEach(type -> {
             types.forEach(targetType->{
                 if(type != targetType) {
 
                     type.getFields().forEach(field -> {
                         if(field.getTypeName().equals(targetType.getName())) {
-                            AbstractList<Type> targets = encapsulations.computeIfAbsent(type, type1 -> new ArrayList<>());
+                            AbstractSet<Type> targets = encapsulations.computeIfAbsent(type, type1 -> new HashSet<>());
                             targets.add(targetType);
                         }
+                        field.getTypeArguments().forEach(arg->{
+                            if(arg.equals(targetType.getName())) {
+                                AbstractSet<Type> targets = encapsulations.computeIfAbsent(type, type1 -> new HashSet<>());
+                                targets.add(targetType);
+                            }
+                        });
                     });
 
                 }

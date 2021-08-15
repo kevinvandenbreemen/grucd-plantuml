@@ -1,5 +1,8 @@
 package com.vandenbreemen.grucd.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Field {
 
     private String name;
@@ -9,10 +12,24 @@ public class Field {
 
     private Visibility visibility;
 
+    /**
+     * For generics
+     */
+    private List<String> typeArguments;
+
     public Field(String name, String typeName, Visibility visibility) {
         this.name = name;
         this.typeName = typeName;
         this.visibility = visibility;
+        this.typeArguments = new ArrayList<>();
+    }
+
+    public void addTypeArgument(String type) {
+        this.typeArguments.add(type);
+    }
+
+    public List<String> getTypeArguments() {
+        return typeArguments;
     }
 
     public String getName() {
