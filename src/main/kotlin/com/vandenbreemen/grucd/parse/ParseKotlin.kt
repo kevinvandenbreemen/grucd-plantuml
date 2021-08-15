@@ -4,6 +4,7 @@ import com.vandenbreemen.grucd.model.Field
 import com.vandenbreemen.grucd.model.Type
 import com.vandenbreemen.grucd.model.Visibility
 import kotlinx.ast.common.AstSource
+import kotlinx.ast.common.ast.DefaultAstNode
 import kotlinx.ast.common.klass.KlassDeclaration
 import kotlinx.ast.grammar.kotlin.common.summary
 import kotlinx.ast.grammar.kotlin.common.summary.PackageHeader
@@ -52,6 +53,25 @@ class ParseKotlin {
                     }
 
                     type.addField(Field(name, parmType, visibility))
+                }
+            }
+            (child as? DefaultAstNode)?.let { node->
+                node.children.forEach {
+                    println(it)
+                    (it as? KlassDeclaration)?.let { declaration->
+                        if(declaration.keyword == "val") {
+                            val name = declaration.identifier?.rawName ?: ""
+                            val parmType = declaration.type[0].rawName
+                            val modifier = if(declaration.modifiers.isEmpty() ) { "public" } else {declaration.modifiers[0].modifier}
+
+                            val visibility: Visibility = when(modifier) {
+                                "private" -> Visibility.Private
+                                else -> Visibility.Public
+                            }
+
+                            type.addField(Field(name, parmType, visibility))
+                        }
+                    }
                 }
             }
         }
