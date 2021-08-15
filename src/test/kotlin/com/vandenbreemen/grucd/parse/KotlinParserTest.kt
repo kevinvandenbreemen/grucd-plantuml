@@ -1,5 +1,6 @@
 package com.vandenbreemen.grucd.parse
 
+import com.vandenbreemen.grucd.model.Visibility
 import kotlinx.ast.common.AstSource
 import kotlinx.ast.common.ast.Ast
 import kotlinx.ast.common.ast.DefaultAstNode
@@ -42,6 +43,18 @@ internal class KotlinParserTest {
 
         fields[0].name shouldBeEqualTo "name"
         fields[0].typeName shouldBeEqualTo "String"
+        fields[0].visibility shouldBeEqualTo Visibility.Public
+    }
+
+    @Test
+    fun `should parse private field`() {
+        val types = ParseKotlin().parse("src/test/resources/kotlin/KotlinWithPrivates.kt")
+        val fields = types[0].fields
+        fields.shouldNotBeEmpty()
+
+        fields[0].name shouldBeEqualTo "privateName"
+        fields[0].typeName shouldBeEqualTo "String"
+        fields[0].visibility shouldBeEqualTo Visibility.Private
     }
 
     @Test

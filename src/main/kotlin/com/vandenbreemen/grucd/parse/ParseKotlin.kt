@@ -42,14 +42,17 @@ class ParseKotlin {
         declaration.children.forEach { child->
             (child as? KlassDeclaration)?.let { kd->
                 kd.parameter.forEach { parm->
+
                     val name = parm.identifier?.rawName ?: ""
                     val parmType = parm.type[0].rawName
+                    val modifier = if(parm.modifiers.isEmpty() ) { "public" } else {parm.modifiers[0].modifier}
 
-                    type.addField(Field(name, parmType, Visibility.Public))
-
-                    parm.children.forEach {
-
+                    val visibility: Visibility = when(modifier) {
+                        "private" -> Visibility.Private
+                        else -> Visibility.Public
                     }
+
+                    type.addField(Field(name, parmType, visibility))
                 }
             }
         }
