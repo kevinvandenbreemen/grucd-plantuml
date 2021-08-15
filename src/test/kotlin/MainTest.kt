@@ -9,4 +9,9 @@ class MainTest {
         Main.main( arrayOf("-f", "src/test/resources/TestJava.java", "-o", "./testOutput/test.svg"));
     }
 
+    @Test
+    fun `should parse source directory on command`() {
+        Main.main(arrayOf("-d", "src/main/java", "-o", "./testOutput/grucd.svg"))
+    }
+
 }

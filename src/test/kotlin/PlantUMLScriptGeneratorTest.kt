@@ -66,4 +66,24 @@ class PlantUMLScriptGeneratorTest {
         script.shouldContain("ContainingClass o--> TestClass")
     }
 
+    @Test
+    fun `should generate diagram with private field in it`() {
+        val type = Type("TestClass", "com.test.types")
+        type.addField(Field("myString", "String", Visibility.Public))
+        val method = Method("getData", "String")
+        method.addParameter(Parameter("argument", "Int"))
+        method.addParameter(Parameter("test", "boolean"))
+        type.addMethod(method)
+
+        val container = Type("ContainingClass", "com.test.types")
+        container.addField(Field("test", "TestClass", Visibility.Private))
+
+        val model = ModelBuilder().build(listOf(type, container))
+        val script = PlantUMLScriptGenerator().render(model)
+        println(script)
+
+        script.shouldContain("ContainingClass o--> TestClass")
+        script.shouldContain("- test: TestClass")
+    }
+
 }

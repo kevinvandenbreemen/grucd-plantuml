@@ -11,13 +11,22 @@ import java.util.function.Consumer;
  */
 public class PlantUMLScriptGenerator {
 
+    private String modifier(Visibility visibility) {
+        switch (visibility) {
+            case Public:
+                return "+ ";
+            default:
+                return "- ";
+        }
+    }
+
     public String renderType(Type type) {
         TabbedWriter writer = new TabbedWriter();
         writer.println("class " + type.getName() + " {").tab();
         type.getFields().forEach(new Consumer<Field>() {
             @Override
             public void accept(Field field) {
-                writer.println("+ " + field.getName() + ": " + field.getTypeName());
+                writer.println(modifier(field.getVisibility()) + field.getName() + ": " + field.getTypeName());
             }
         });
         type.getMethods().forEach(new Consumer<Method>() {
@@ -45,7 +54,7 @@ public class PlantUMLScriptGenerator {
 
     @NotNull
     public String render(@NotNull Model model) {
-        StringBuilder script = new StringBuilder();
+        StringBuilder script = new StringBuilder("@startuml\n");
         model.getTypes().forEach(type->{
             script.append(renderType(type)).append("\n");
         });
@@ -63,6 +72,6 @@ public class PlantUMLScriptGenerator {
             }
         });
 
-        return script.toString();
+        return script.append("\n@enduml").toString();
     }
 }
