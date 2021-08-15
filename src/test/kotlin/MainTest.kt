@@ -11,7 +11,7 @@ class MainTest {
 
     @Test
     fun `should parse source directory on command`() {
-        Main.main(arrayOf("-d", "src/main/java", "-o", "./testOutput/grucd.svg"))
+        Main.main(arrayOf("-d", "src/main/", "-o", "./testOutput/grucd.svg"))
     }
 
 }

@@ -4,6 +4,7 @@ import com.vandenbreemen.grucd.builder.ModelBuilder;
 import com.vandenbreemen.grucd.model.Model;
 import com.vandenbreemen.grucd.model.Type;
 import com.vandenbreemen.grucd.parse.ParseJava;
+import com.vandenbreemen.grucd.parse.ParseKotlin;
 import com.vandenbreemen.grucd.render.plantuml.PlantUMLRenderer;
 import com.vandenbreemen.grucd.render.plantuml.PlantUMLScriptGenerator;
 import com.vandenbreemen.kevincommon.cmd.CommandLineParameters;
@@ -36,7 +37,11 @@ public class Main {
             logger.info("Parsing directory "+inputDir);
             try {
                 Files.walk(Paths.get(inputDir)).filter((filePath)->{return filePath.getFileName().toString().endsWith(".java");}).forEach(path -> {
-                    logger.debug("path="+path.toFile().getAbsolutePath());
+                    logger.debug("path (java)="+path.toFile().getAbsolutePath());
+                    filesToVisit.add(path.toFile().getAbsolutePath());
+                });
+                Files.walk(Paths.get(inputDir)).filter((filePath)->{return filePath.getFileName().toString().endsWith(".kt");}).forEach(path -> {
+                    logger.debug("path (kotlin)="+path.toFile().getAbsolutePath());
                     filesToVisit.add(path.toFile().getAbsolutePath());
                 });
             } catch (IOException ioe) {
@@ -45,14 +50,21 @@ public class Main {
         }
 
         ParseJava java = new ParseJava();
-        PlantUMLRenderer renderer = new PlantUMLRenderer();
-        ModelBuilder modelBuilder = new ModelBuilder();
+        ParseKotlin kotlin = new ParseKotlin();
 
         List<Type> allTypes = new ArrayList<>();
 
         filesToVisit.forEach(file->{
-            allTypes.addAll(java.parse(file));
+            if(file.endsWith(".java")) {
+                allTypes.addAll(java.parse(file));
+            } else if(file.endsWith(".kt")) {
+                allTypes.addAll(kotlin.parse(file));
+            }
         });
+
+
+        PlantUMLRenderer renderer = new PlantUMLRenderer();
+        ModelBuilder modelBuilder = new ModelBuilder();
 
         Model model = modelBuilder.build(allTypes);
 
