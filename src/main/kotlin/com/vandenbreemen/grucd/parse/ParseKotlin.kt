@@ -25,7 +25,6 @@ class ParseKotlin {
                 }
 
                 (astItem as? KlassDeclaration)?.let {
-                    println(it.identifier?.rawName)
 
                     val type = Type(it.identifier?.rawName ?: "", pkg?.identifier?.get(0)?.rawName ?: "")
                     handleClassDeclaration(it, type)
