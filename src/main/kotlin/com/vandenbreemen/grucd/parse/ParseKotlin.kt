@@ -31,7 +31,7 @@ class ParseKotlin {
                 (astItem as? KlassDeclaration)?.let {
 
                     val type = Type(it.identifier?.rawName ?: "", pkg?.identifier?.get(0)?.rawName ?: "")
-                    handleClassDeclaration(it, type)
+                    handleClassDeclaration(it, type, result)
                     result.add(type)
 
                 }
@@ -41,7 +41,7 @@ class ParseKotlin {
         return result
     }
 
-    private fun handleClassDeclaration(declaration: KlassDeclaration, type: Type) {
+    private fun handleClassDeclaration(declaration: KlassDeclaration, type: Type, classList: MutableList<Type>) {
 
         logger.debug("Parsing class ${type.name}...")
 
@@ -81,6 +81,14 @@ class ParseKotlin {
                                 }
 
                                 type.addMethod(method)
+                            }
+                        }
+                        else if(declaration.keyword == "class") {
+                            logger.debug("Found nested class ${declaration.identifier?.rawName}")
+                            declaration.identifier?.rawName?.let { nestedTypeName->
+                                val nestedType = Type(nestedTypeName, type.pkg)
+                                handleClassDeclaration(declaration, nestedType, classList)
+                                classList.add(nestedType)
                             }
                         }
                     }

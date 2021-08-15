@@ -120,6 +120,14 @@ internal class KotlinParserTest {
     }
 
     @Test
+    fun `should parse nested classes`() {
+        val types = ParseKotlin().parse("src/test/resources/kotlin/ClassWithANestedClass.kt")
+        types.size shouldBeEqualTo 2
+
+        println(types)
+    }
+
+    @Test
     fun `learning test to parse Kotlin with kotlinx dot ast`() {
 
 
