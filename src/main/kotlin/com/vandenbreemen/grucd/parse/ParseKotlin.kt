@@ -98,7 +98,10 @@ class ParseKotlin {
                     }
                 }
             }
-        } finally {
+        } catch (e: Exception) {
+            logger.error("Could not parse type due to error", e)
+        }
+        finally {
             NDC.pop()
         }
     }
