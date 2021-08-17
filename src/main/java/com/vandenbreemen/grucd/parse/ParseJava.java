@@ -74,6 +74,10 @@ public class ParseJava {
                                     logger.trace("Recognized parent type "+classOrInterfaceType.getNameAsString());
                                     currentType.addSuperType(classOrInterfaceType.getNameAsString());
                                 });
+                                n.getImplementedTypes().forEach(classOrInterfaceType -> {
+                                    logger.trace("Recognized implemented interface " + classOrInterfaceType.getNameAsString());
+                                    currentType.addInterface(classOrInterfaceType.getNameAsString());
+                                });
                                 super.visit(n, new VisitorContext(currentType));
                             } finally {
                                 NDC.pop();

@@ -156,4 +156,34 @@ class JavaParserTest {
         relation.type shouldBeEqualTo RelationType.nested
     }
 
+    @Test
+    fun `should parse subclasses`() {
+        val types = ParseJava().parse("src/test/resources/extending/Subclass.java")
+        types.size shouldBeEqualTo 2
+
+        val builder = ModelBuilder()
+        val model = builder.build(types)
+
+        model.relations.size shouldBeEqualTo 1
+        val relation = model.relations[0]
+        relation.type shouldBeEqualTo RelationType.subclass
+        relation.from.name shouldBeEqualTo "Subclass"
+        relation.to.name shouldBeEqualTo "Superclass"
+    }
+
+    @Test
+    fun `should parse interface implementations`() {
+        val types = ParseJava().parse("src/test/resources/extending/InterfaceImplementation.java")
+        types.size shouldBeEqualTo 2
+
+        val builder = ModelBuilder()
+        val model = builder.build(types)
+
+        model.relations.size shouldBeEqualTo 1
+        val relation = model.relations[0]
+        relation.type shouldBeEqualTo RelationType.implementation
+        relation.from.name shouldBeEqualTo "Implementation"
+        relation.to.name shouldBeEqualTo "Interface"
+    }
+
 }

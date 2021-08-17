@@ -25,6 +25,11 @@ public class Type {
      */
     private List<String> superTypeNames;
 
+    /**
+     * Names of all implemented interfaces
+     */
+    private List<String> interfaceNames;
+
     public Type(String name, String pkg, TypeType type) {
         this.name = name;
         this.pkg = pkg;
@@ -32,6 +37,7 @@ public class Type {
         this.fields = new ArrayList<>();
         this.methods = new ArrayList<>();
         this.superTypeNames = new ArrayList<>();
+        this.interfaceNames = new ArrayList<>();
     }
 
     public Type(String name, String pkg) {
@@ -80,6 +86,14 @@ public class Type {
 
     public Type getParentType() {
         return parentType;
+    }
+
+    public void addInterface(String name) {
+        this.interfaceNames.add(name);
+    }
+
+    public List<String> getInterfaceNames() {
+        return interfaceNames;
     }
 
     @Override

@@ -51,6 +51,14 @@ public class ModelBuilder {
             });
         });
 
+        types.forEach(type->{
+            type.getInterfaceNames().forEach(interfaceName->{
+                types.stream().filter(t->t.getName().equals(interfaceName)).findFirst().ifPresent(intrface->{
+                    model.addRelation(new TypeRelation(type, intrface, RelationType.implementation));
+                });
+            });
+        });
+
         encapsulations.entrySet().forEach(relationSet->{
             relationSet.getValue().forEach(target->{
                 model.addRelation(new TypeRelation(relationSet.getKey(), target, RelationType.encapsulates));
