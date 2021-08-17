@@ -46,14 +46,8 @@ public class ParseJava {
                 public void accept(CompilationUnit unit) {
                     unit.accept(new VoidVisitorAdapter<VisitorContext>() {
 
-                        private Type currentType;
-
                         @Override
                         public void visit(ClassOrInterfaceDeclaration n, VisitorContext visitorContext) {
-
-                            if(currentType != null) {
-                                NDC.pop();
-                            }
 
                             String name = n.getNameAsString();
                             final String[] packageName = {""};
@@ -66,23 +60,25 @@ public class ParseJava {
                                 }
                             });
 
-                            currentType = new Type(n.getNameAsString(), packageName[0], n.isInterface() ? TypeType.Interface : TypeType.Class);
+                            Type currentType = new Type(n.getNameAsString(), packageName[0], n.isInterface() ? TypeType.Interface : TypeType.Class);
 
                             if(visitorContext != null) {
                                 currentType.setParentType(visitorContext.parentType);
                             }
 
-                            NDC.push(currentType.getName());
                             result.add(currentType);
-                            super.visit(n, new VisitorContext(currentType));
+
+                            NDC.push(currentType.getName());
+                            try {
+                                super.visit(n, new VisitorContext(currentType));
+                            } finally {
+                                NDC.pop();
+                            }
+
                         }
 
                         @Override
                         public void visit(EnumDeclaration n, VisitorContext arg) {
-
-                            if(currentType != null) {
-                                NDC.pop();
-                            }
 
                             String name = n.getNameAsString();
                             final String[] packageName = {""};
@@ -95,22 +91,33 @@ public class ParseJava {
                                 }
                             });
 
-                            currentType = new Type(n.getNameAsString(), packageName[0], TypeType.Enum);
-                            NDC.push(currentType.getName());
+                            Type currentType = new Type(n.getNameAsString(), packageName[0], TypeType.Enum);
                             result.add(currentType);
-                            super.visit(n, arg);
+
+                            NDC.push(currentType.getName());
+                            VisitorContext context = new VisitorContext(currentType);
+                            logger.trace("Visiting enum and fields");
+                            try {
+                                super.visit(n, context);
+                            } finally {
+                                NDC.pop();
+                            }
                         }
 
                         @Override
-                        public void visit(EnumConstantDeclaration n, VisitorContext arg) {
+                        public void visit(EnumConstantDeclaration n, VisitorContext visitorContext) {
 
+                            Type currentType = visitorContext.parentType;
                             currentType.addField(new Field(n.getNameAsString(), currentType.getName(), Visibility.Public));
 
-                            super.visit(n, arg);
+                            super.visit(n, visitorContext);
                         }
 
                         @Override
-                        public void visit(FieldDeclaration n, VisitorContext arg) {
+                        public void visit(FieldDeclaration n, VisitorContext visitorContext) {
+
+                            Type currentType = visitorContext.parentType;
+
                             for (VariableDeclarator dec : n.getVariables()) {
                                 Visibility visibility;
                                 if(n.hasModifier(Modifier.publicModifier().getKeyword())){
@@ -133,8 +140,10 @@ public class ParseJava {
                         }
 
                         @Override
-                        public void visit(MethodDeclaration n, VisitorContext arg) {
-                            super.visit(n, arg);
+                        public void visit(MethodDeclaration n, VisitorContext visitorContext) {
+                            super.visit(n, visitorContext);
+
+                            Type currentType = visitorContext.parentType;
 
                             if(!n.hasModifier(Modifier.publicModifier().getKeyword())) {
                                 return;

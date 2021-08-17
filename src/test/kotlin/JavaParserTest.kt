@@ -141,6 +141,9 @@ class JavaParserTest {
         types[0].name shouldBeEqualTo "MainClass"
         types[1].name shouldBeEqualTo "NestedClass"
 
+        types[0].methods.size shouldBeEqualTo 2
+        types[1].methods.size shouldBeEqualTo 1
+
         val builder = ModelBuilder()
         val model = builder.build(types)
 

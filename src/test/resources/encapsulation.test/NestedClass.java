@@ -9,5 +9,8 @@ class MainClass {
     public NestedClass newNestedClass() {
         return new NestedClass();
     }
+    public String getMainName() {
+        return "Main";
+    }
 
 }
