@@ -11,6 +11,7 @@ import kotlinx.ast.grammar.kotlin.common.summary
 import kotlinx.ast.grammar.kotlin.target.antlr.kotlin.KotlinGrammarAntlrKotlinParser
 import org.amshove.kluent.shouldBeEqualTo
 import org.amshove.kluent.shouldNotBeEmpty
+import org.amshove.kluent.shouldNotBeNullOrEmpty
 import org.apache.log4j.Logger
 import org.apache.log4j.NDC
 import org.junit.jupiter.api.Test
@@ -125,6 +126,20 @@ internal class KotlinParserTest {
         types.size shouldBeEqualTo 2
 
         println(types)
+    }
+
+    @Test
+    fun `should parse functions with function parameters`() {
+        val types = ParseKotlin().parse("src/test/resources/kotlin/ClassWithCallbacks.kt")
+        types.size shouldBeEqualTo 1
+        val t = types[0]
+        t.methods.count() shouldBeEqualTo 1
+
+        val method = t.methods[0]
+        method.parameters.count() shouldBeEqualTo 1
+        val parameter = method.parameters[0]
+
+        parameter.typeName.shouldNotBeNullOrEmpty()
     }
 
     @Test

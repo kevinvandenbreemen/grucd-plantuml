@@ -3,8 +3,11 @@ plugins {
     java
 }
 
+val versionRaw = File("src/main/resources/version.properties")
+val versionNumber = versionRaw.readText()
+
 group = "org.example"
-version = "1.0-SNAPSHOT"
+version = versionNumber
 
 repositories {
     mavenCentral()

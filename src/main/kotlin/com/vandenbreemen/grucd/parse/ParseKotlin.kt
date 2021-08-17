@@ -78,11 +78,7 @@ class ParseKotlin {
 
                                     val method = Method(name, returnType)
                                     declaration.parameter.forEach { methodParam ->
-                                        val parmType = if(methodParam.type.isNotEmpty()) { methodParam.type[0].rawName } else {
-                                            methodParam.children.firstOrNull { it-> it is KlassIdentifier }?.let { kid -> (kid as? KlassIdentifier)?.let {
-                                                it.identifier
-                                            }} ?: ""
-                                        }
+                                        val parmType = getParameterType(methodParam)
                                         methodParam.identifier?.let { parameterName ->
                                             method.addParameter(Parameter(parameterName.rawName, parmType))
                                         }
@@ -102,9 +98,19 @@ class ParseKotlin {
                     }
                 }
             }
-        } finally {
+        } catch (e: Exception) {
+            logger.error("Could not parse type due to error", e)
+        }
+        finally {
             NDC.pop()
         }
+    }
+
+    private fun getParameterType(methodParam: KlassDeclaration): String {
+
+        if(methodParam.type.isNotEmpty()) { return methodParam.type[0].rawName }
+
+        return "unknown"
     }
 
     private fun processPropertyDeclaration(

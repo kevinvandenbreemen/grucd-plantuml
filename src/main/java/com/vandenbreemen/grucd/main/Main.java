@@ -1,6 +1,7 @@
 package com.vandenbreemen.grucd.main;
 
 import com.vandenbreemen.grucd.builder.ModelBuilder;
+import com.vandenbreemen.grucd.doc.SystemInfo;
 import com.vandenbreemen.grucd.model.Model;
 import com.vandenbreemen.grucd.model.Type;
 import com.vandenbreemen.grucd.parse.ParseJava;
@@ -22,6 +23,8 @@ public class Main {
     private static final Logger logger = Logger.getLogger(Main.class);
 
     public static void main(String[] args) {
+
+        new SystemInfo().print();
 
         CommandLineParameters params = new CommandLineParameters(args);
         String outputPath = params.getArgument("o");
