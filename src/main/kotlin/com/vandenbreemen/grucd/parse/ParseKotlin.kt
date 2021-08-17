@@ -90,6 +90,7 @@ class ParseKotlin {
                                 logger.debug("Found nested class ${declaration.identifier?.rawName}")
                                 declaration.identifier?.rawName?.let { nestedTypeName ->
                                     val nestedType = Type(nestedTypeName, type.pkg)
+                                    nestedType.parentType = type
                                     handleClassDeclaration(declaration, nestedType, classList)
                                     classList.add(nestedType)
                                 }

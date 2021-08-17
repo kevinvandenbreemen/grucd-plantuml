@@ -1,5 +1,6 @@
 package com.vandenbreemen.grucd.parse
 
+import com.vandenbreemen.grucd.builder.ModelBuilder
 import com.vandenbreemen.grucd.model.Visibility
 import kotlinx.ast.common.AstSource
 import kotlinx.ast.common.ast.Ast
@@ -125,7 +126,11 @@ internal class KotlinParserTest {
         val types = ParseKotlin().parse("src/test/resources/kotlin/ClassWithANestedClass.kt")
         types.size shouldBeEqualTo 2
 
-        println(types)
+        val model = ModelBuilder().build(types)
+        model.relations.size shouldBeEqualTo 1
+        val relation = model.relations[0]
+        relation.from.name shouldBeEqualTo "ClassWithANestedClass"
+        relation.to.name shouldBeEqualTo "NestedClass"
     }
 
     @Test
