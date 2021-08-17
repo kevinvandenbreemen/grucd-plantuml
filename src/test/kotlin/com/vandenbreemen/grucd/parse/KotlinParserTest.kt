@@ -136,7 +136,7 @@ internal class KotlinParserTest {
         types[0].name shouldBeEqualTo "NestedClass"
 
         types[1].methods.size shouldBeEqualTo 1
-        types[0].methods.size shouldBeEqualTo 0
+        types[0].methods.size shouldBeEqualTo 2
     }
 
     @Test

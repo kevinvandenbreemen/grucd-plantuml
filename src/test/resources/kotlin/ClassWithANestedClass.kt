@@ -6,6 +6,9 @@ class ClassWithANestedClass {
 
         val someValue: String = ""
 
+        fun test(){}
+        fun test2(){}
+
     }
 
     fun makeMyNested(): NestedClass {
