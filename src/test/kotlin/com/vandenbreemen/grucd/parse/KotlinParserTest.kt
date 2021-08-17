@@ -1,6 +1,7 @@
 package com.vandenbreemen.grucd.parse
 
 import com.vandenbreemen.grucd.builder.ModelBuilder
+import com.vandenbreemen.grucd.model.RelationType
 import com.vandenbreemen.grucd.model.Visibility
 import kotlinx.ast.common.AstSource
 import kotlinx.ast.common.ast.Ast
@@ -151,6 +152,19 @@ internal class KotlinParserTest {
         val parameter = method.parameters[0]
 
         parameter.typeName.shouldNotBeNullOrEmpty()
+    }
+
+    @Test
+    fun `should parse subclass`() {
+        val types = ParseKotlin().parse("src/test/resources/kotlin/Superclass.kt")
+        types.size shouldBeEqualTo 2
+
+        val model = ModelBuilder().build(types)
+        model.relations.size shouldBeEqualTo 1
+        val relation = model.relations[0]
+        relation.type shouldBeEqualTo RelationType.subclass
+        relation.from.name shouldBeEqualTo "Subclass"
+        relation.to.name shouldBeEqualTo "Superclass"
     }
 
     @Test

@@ -49,6 +49,11 @@ class ParseKotlin {
         NDC.push(type.name)
 
         try {
+            declaration.inheritance.forEach { klassInheritance ->
+                val superTypeName = klassInheritance.type.rawName
+                logger.trace("Recognizing superclass $superTypeName")
+                type.addSuperType(superTypeName)
+            }
             declaration.children.forEach { child ->
                 (child as? KlassDeclaration)?.let { kd ->
                     kd.parameter.forEach { parm ->
