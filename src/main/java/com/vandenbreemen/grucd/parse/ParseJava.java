@@ -70,6 +70,10 @@ public class ParseJava {
 
                             NDC.push(currentType.getName());
                             try {
+                                n.getExtendedTypes().forEach(classOrInterfaceType -> {
+                                    logger.trace("Recognized parent type "+classOrInterfaceType.getNameAsString());
+                                    currentType.addSuperType(classOrInterfaceType.getNameAsString());
+                                });
                                 super.visit(n, new VisitorContext(currentType));
                             } finally {
                                 NDC.pop();

@@ -43,6 +43,14 @@ public class ModelBuilder {
             }
         });
 
+        types.forEach(type -> {
+            type.getSuperTypeNames().forEach(superTypeName->{
+                types.stream().filter(t->t.getName().equals(superTypeName)).findFirst().ifPresent(superType->{
+                    model.addRelation(new TypeRelation(type, superType, RelationType.subclass));
+                });
+            });
+        });
+
         encapsulations.entrySet().forEach(relationSet->{
             relationSet.getValue().forEach(target->{
                 model.addRelation(new TypeRelation(relationSet.getKey(), target, RelationType.encapsulates));

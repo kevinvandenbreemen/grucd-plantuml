@@ -20,16 +20,30 @@ public class Type {
 
     private Type parentType;    //  For nested classes
 
+    /**
+     * Names of all super-types
+     */
+    private List<String> superTypeNames;
+
     public Type(String name, String pkg, TypeType type) {
         this.name = name;
         this.pkg = pkg;
         this.type = type;
         this.fields = new ArrayList<>();
         this.methods = new ArrayList<>();
+        this.superTypeNames = new ArrayList<>();
     }
 
     public Type(String name, String pkg) {
         this(name, pkg, TypeType.Class);
+    }
+
+    public void addSuperType(String name) {
+        this.superTypeNames.add(name);
+    }
+
+    public List<String> getSuperTypeNames() {
+        return superTypeNames;
     }
 
     public String getName() {

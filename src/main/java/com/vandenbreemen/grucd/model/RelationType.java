@@ -7,6 +7,11 @@ public enum RelationType {
     /**
      * Designates a nested class (class declared within a class)
      */
-    nested;
+    nested,
+
+    subclass,
+
+    implementation,
+    ;
 
 }
