@@ -133,4 +133,24 @@ class JavaParserTest {
         types.size shouldBeEqualTo 2
     }
 
+    @Test
+    fun `should parse nested class`() {
+        val types = ParseJava().parse("src/test/resources/encapsulation.test/NestedClass.java")
+        types.size shouldBeEqualTo 2
+
+        types[0].name shouldBeEqualTo "MainClass"
+        types[1].name shouldBeEqualTo "NestedClass"
+
+        val builder = ModelBuilder()
+        val model = builder.build(types)
+
+        model.relations.shouldNotBeEmpty()
+        model.relations.size shouldBeEqualTo 1
+
+        val relation = model.relations[0]
+        relation.from.name shouldBeEqualTo "MainClass"
+        relation.to.name shouldBeEqualTo "NestedClass"
+        relation.type shouldBeEqualTo RelationType.nested
+    }
+
 }

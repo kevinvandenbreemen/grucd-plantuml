@@ -37,6 +37,12 @@ public class ModelBuilder {
             });
         });
 
+        types.forEach(type -> {
+            if(type.getParentType() != null) {
+                model.addRelation(new TypeRelation(type.getParentType(), type, RelationType.nested));
+            }
+        });
+
         encapsulations.entrySet().forEach(relationSet->{
             relationSet.getValue().forEach(target->{
                 model.addRelation(new TypeRelation(relationSet.getKey(), target, RelationType.encapsulates));

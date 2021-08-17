@@ -22,6 +22,14 @@ public class ParseJava {
 
     private static final Logger logger = Logger.getLogger(ParseJava.class);
 
+    private class VisitorContext {
+        Type parentType;
+
+        public VisitorContext(Type parentType) {
+            this.parentType = parentType;
+        }
+    }
+
     public List<Type> parse(String filePath) {
 
         logger.debug("Parsing " + filePath);
@@ -36,12 +44,12 @@ public class ParseJava {
             unit.getResult().ifPresent(new Consumer<>() {
                 @Override
                 public void accept(CompilationUnit unit) {
-                    unit.accept(new VoidVisitorAdapter<Void>() {
+                    unit.accept(new VoidVisitorAdapter<VisitorContext>() {
 
                         private Type currentType;
 
                         @Override
-                        public void visit(ClassOrInterfaceDeclaration n, Void arg) {
+                        public void visit(ClassOrInterfaceDeclaration n, VisitorContext visitorContext) {
 
                             if(currentType != null) {
                                 NDC.pop();
@@ -59,13 +67,18 @@ public class ParseJava {
                             });
 
                             currentType = new Type(n.getNameAsString(), packageName[0], n.isInterface() ? TypeType.Interface : TypeType.Class);
+
+                            if(visitorContext != null) {
+                                currentType.setParentType(visitorContext.parentType);
+                            }
+
                             NDC.push(currentType.getName());
                             result.add(currentType);
-                            super.visit(n, arg);
+                            super.visit(n, new VisitorContext(currentType));
                         }
 
                         @Override
-                        public void visit(EnumDeclaration n, Void arg) {
+                        public void visit(EnumDeclaration n, VisitorContext arg) {
 
                             if(currentType != null) {
                                 NDC.pop();
@@ -89,7 +102,7 @@ public class ParseJava {
                         }
 
                         @Override
-                        public void visit(EnumConstantDeclaration n, Void arg) {
+                        public void visit(EnumConstantDeclaration n, VisitorContext arg) {
 
                             currentType.addField(new Field(n.getNameAsString(), currentType.getName(), Visibility.Public));
 
@@ -97,7 +110,7 @@ public class ParseJava {
                         }
 
                         @Override
-                        public void visit(FieldDeclaration n, Void arg) {
+                        public void visit(FieldDeclaration n, VisitorContext arg) {
                             for (VariableDeclarator dec : n.getVariables()) {
                                 Visibility visibility;
                                 if(n.hasModifier(Modifier.publicModifier().getKeyword())){
@@ -120,7 +133,7 @@ public class ParseJava {
                         }
 
                         @Override
-                        public void visit(MethodDeclaration n, Void arg) {
+                        public void visit(MethodDeclaration n, VisitorContext arg) {
                             super.visit(n, arg);
 
                             if(!n.hasModifier(Modifier.publicModifier().getKeyword())) {

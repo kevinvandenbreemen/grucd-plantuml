@@ -18,6 +18,8 @@ public class Type {
 
     private TypeType type;
 
+    private Type parentType;    //  For nested classes
+
     public Type(String name, String pkg, TypeType type) {
         this.name = name;
         this.pkg = pkg;
@@ -56,6 +58,14 @@ public class Type {
 
     public TypeType getType() {
         return type;
+    }
+
+    public void setParentType(Type parentType) {
+        this.parentType = parentType;
+    }
+
+    public Type getParentType() {
+        return parentType;
     }
 
     @Override
