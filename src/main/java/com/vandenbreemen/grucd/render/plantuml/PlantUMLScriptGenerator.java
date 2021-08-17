@@ -83,6 +83,12 @@ public class PlantUMLScriptGenerator {
                 case nested:
                     relationshipOperator = "+-->";
                     break;
+                case subclass:
+                    relationshipOperator = "--|>";
+                    break;
+                case implementation:
+                    relationshipOperator = "..|>";
+                    break;
             }
 
             if(relationshipOperator != null) {

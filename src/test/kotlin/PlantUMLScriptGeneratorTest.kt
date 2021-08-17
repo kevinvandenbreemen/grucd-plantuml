@@ -100,4 +100,32 @@ class PlantUMLScriptGeneratorTest {
         script.shouldContain("Main +--> Nested")
     }
 
+    @Test
+    fun `should generate diagram with superclass in it`() {
+        val type1 = Type("Main", "com.kevin", TypeType.Class)
+        val type2 = Type("Superclass", "com.kevin", TypeType.Class)
+        type1.addSuperType("Superclass")
+
+        val model = ModelBuilder().build(listOf(type1, type2))
+
+        val script = PlantUMLScriptGenerator().render(model)
+        println(script)
+
+        script.shouldContain("Main --|> Superclass")
+    }
+
+    @Test
+    fun `should generate diagram with interface implementation in it`() {
+        val type1 = Type("Main", "com.kevin", TypeType.Class)
+        val type2 = Type("Interface", "com.kevin", TypeType.Class)
+        type1.addInterface("Interface")
+
+        val model = ModelBuilder().build(listOf(type1, type2))
+
+        val script = PlantUMLScriptGenerator().render(model)
+        println(script)
+
+        script.shouldContain("Main ..|> Interface")
+    }
+
 }
