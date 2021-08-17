@@ -131,6 +131,12 @@ internal class KotlinParserTest {
         val relation = model.relations[0]
         relation.from.name shouldBeEqualTo "ClassWithANestedClass"
         relation.to.name shouldBeEqualTo "NestedClass"
+
+        types[1].name shouldBeEqualTo "ClassWithANestedClass"
+        types[0].name shouldBeEqualTo "NestedClass"
+
+        types[1].methods.size shouldBeEqualTo 1
+        types[0].methods.size shouldBeEqualTo 0
     }
 
     @Test
