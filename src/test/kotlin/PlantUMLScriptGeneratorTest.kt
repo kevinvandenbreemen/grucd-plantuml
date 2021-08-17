@@ -86,4 +86,18 @@ class PlantUMLScriptGeneratorTest {
         script.shouldContain("- test: TestClass")
     }
 
+    @Test
+    fun `should generate diagram with nested types in it`() {
+        val type1 = Type("Main", "com.kevin", TypeType.Class)
+        val type2 = Type("Nested", "com.kevin", TypeType.Class)
+        type2.parentType = type1
+
+        val model = ModelBuilder().build(listOf(type1, type2))
+
+        val script = PlantUMLScriptGenerator().render(model)
+        println(script)
+
+        script.shouldContain("Main +--> Nested")
+    }
+
 }

@@ -76,8 +76,13 @@ public class PlantUMLScriptGenerator {
 
             String relationshipOperator = null;
 
-            if(relation.getType() == RelationType.encapsulates) {
-                relationshipOperator = "o-->";
+            switch (relation.getType()) {
+                case encapsulates:
+                    relationshipOperator = "o-->";
+                    break;
+                case nested:
+                    relationshipOperator = "+-->";
+                    break;
             }
 
             if(relationshipOperator != null) {
