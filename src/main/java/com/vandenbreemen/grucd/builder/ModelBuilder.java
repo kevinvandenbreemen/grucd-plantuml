@@ -1,9 +1,6 @@
 package com.vandenbreemen.grucd.builder;
 
-import com.vandenbreemen.grucd.model.Model;
-import com.vandenbreemen.grucd.model.RelationType;
-import com.vandenbreemen.grucd.model.Type;
-import com.vandenbreemen.grucd.model.TypeRelation;
+import com.vandenbreemen.grucd.model.*;
 
 import java.util.*;
 
@@ -46,7 +43,12 @@ public class ModelBuilder {
         types.forEach(type -> {
             type.getSuperTypeNames().forEach(superTypeName->{
                 types.stream().filter(t->t.getName().equals(superTypeName)).findFirst().ifPresent(superType->{
-                    model.addRelation(new TypeRelation(type, superType, RelationType.subclass));
+
+                    if(superType.getType() == TypeType.Interface) {
+                        model.addRelation(new TypeRelation(type, superType, RelationType.implementation));
+                    } else {
+                        model.addRelation(new TypeRelation(type, superType, RelationType.subclass));
+                    }
                 });
             });
         });

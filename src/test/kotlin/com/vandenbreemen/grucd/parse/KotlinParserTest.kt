@@ -168,6 +168,19 @@ internal class KotlinParserTest {
     }
 
     @Test
+    fun `should parse interface implementation`() {
+        val types = ParseKotlin().parse("src/test/resources/kotlin/InterfaceImplementation.kt")
+        types.size shouldBeEqualTo 2
+
+        val model = ModelBuilder().build(types)
+        model.relations.size shouldBeEqualTo 1
+        val relation = model.relations[0]
+        relation.type shouldBeEqualTo RelationType.implementation
+        relation.from.name shouldBeEqualTo "InterfaceImplementation"
+        relation.to.name shouldBeEqualTo "Interface"
+    }
+
+    @Test
     fun `learning test to parse Kotlin with kotlinx dot ast`() {
 
 

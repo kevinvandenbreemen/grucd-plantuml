@@ -32,7 +32,10 @@ class ParseKotlin {
 
                 (astItem as? KlassDeclaration)?.let {
 
-                    val type = Type(it.identifier?.rawName ?: "", pkg?.identifier?.get(0)?.rawName ?: "")
+                    val type = Type(it.identifier?.rawName ?: "", pkg?.identifier?.get(0)?.rawName ?: "",
+                        if(it.keyword == "interface") {TypeType.Interface } else { TypeType.Class }
+                        )
+
                     handleClassDeclaration(it, type, result)
                     result.add(type)
 
@@ -45,7 +48,7 @@ class ParseKotlin {
 
     private fun handleClassDeclaration(declaration: KlassDeclaration, type: Type, classList: MutableList<Type>) {
 
-        logger.debug("Parsing class ${type.name}...")
+        logger.debug("Parsing ${type.type} ${type.name}...")
         NDC.push(type.name)
 
         try {
