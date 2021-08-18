@@ -27,10 +27,17 @@ public class Main {
         new SystemInfo().print();
 
         CommandLineParameters params = new CommandLineParameters(args);
+        params.addRequired("o", "Where to store the resulting class diagram SVG file");
+        params.addRequired("f", "(or else -d) file you wish to parse and generate UML of");
+        params.addRequired("d", "(or else -f) directory you wish to parse and generate UML of");
+        if(!params.validate()) {
+            System.out.println(params.document());
+            return;
+        }
+
         String outputPath = params.getArgument("o");
         String inputFile = params.getArgument("f");
         String inputDir = params.getArgument("d");
-        String language = params.getArgument("l");
 
         List<String> filesToVisit = new ArrayList<>();
         if(inputFile != null) {
