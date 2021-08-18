@@ -31,13 +31,35 @@ dependencies {
     val log4jVersion = "1.2.14"
     implementation("log4j:log4j:$log4jVersion")
 
-    val kevinCommonVersion = "1.0.4"
+    val kevinCommonVersion = "1.0.6.1000"
     implementation("com.github.kevinvandenbreemen:kevin-common:$kevinCommonVersion")
 
     val kotlinParserVersion = "bf1da05656"
     implementation("com.github.kotlinx.ast:common:$kotlinParserVersion")
     implementation("com.github.kotlinx.ast:grammar-kotlin-parser-antlr-kotlin:$kotlinParserVersion")
 
+}
+
+val fatJar = task("FatJar", type = Jar::class) {
+
+    val jarName = "grucd.jar"
+
+    archiveName = jarName
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
+    manifest {
+        attributes["Main-Class"] = "com.vandenbreemen.grucd.main.Main"
+
+    }
+    from(configurations.runtimeClasspath.get().map {
+        if(it.isDirectory) it else zipTree(it)
+    })
+    with(tasks.jar.get() as CopySpec)
+
+    copy {
+        from("build/libs/$jarName")
+        into("./")
+    }
+    println("Built and copied $jarName")
 }
 
 tasks.getByName<Test>("test") {

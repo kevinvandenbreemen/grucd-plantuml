@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Main {
@@ -24,13 +25,22 @@ public class Main {
 
     public static void main(String[] args) {
 
+        System.out.println("ARGS:  "+Arrays.asList(args));
+
         new SystemInfo().print();
 
         CommandLineParameters params = new CommandLineParameters(args);
+        params.addRequired("o", "Where to store the resulting class diagram SVG file");
+        params.addAtLeast("f", "(or else -d) file you wish to parse and generate UML of");
+        params.addAtLeast("d", "(or else -f) directory you wish to parse and generate UML of");
+        if(!params.validate()) {
+            System.out.println(params.document());
+            return;
+        }
+
         String outputPath = params.getArgument("o");
         String inputFile = params.getArgument("f");
         String inputDir = params.getArgument("d");
-        String language = params.getArgument("l");
 
         List<String> filesToVisit = new ArrayList<>();
         if(inputFile != null) {
