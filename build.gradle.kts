@@ -31,7 +31,7 @@ dependencies {
     val log4jVersion = "1.2.14"
     implementation("log4j:log4j:$log4jVersion")
 
-    val kevinCommonVersion = "1.0.5.1000"
+    val kevinCommonVersion = "1.0.6.1000"
     implementation("com.github.kevinvandenbreemen:kevin-common:$kevinCommonVersion")
 
     val kotlinParserVersion = "bf1da05656"
