@@ -2,10 +2,13 @@ package com.vandenbreemen.grucd.parse
 
 import com.vandenbreemen.grucd.model.*
 import kotlinx.ast.common.AstSource
+import kotlinx.ast.common.ast.Ast
 import kotlinx.ast.common.ast.DefaultAstNode
 import kotlinx.ast.common.klass.KlassDeclaration
 import kotlinx.ast.common.klass.KlassIdentifier
+import kotlinx.ast.common.klass.identifierName
 import kotlinx.ast.grammar.kotlin.common.summary
+import kotlinx.ast.grammar.kotlin.common.summary.Import
 import kotlinx.ast.grammar.kotlin.common.summary.PackageHeader
 import kotlinx.ast.grammar.kotlin.target.antlr.kotlin.KotlinGrammarAntlrKotlinParser
 import org.apache.log4j.Logger
@@ -17,10 +20,28 @@ class ParseKotlin {
         private val logger:Logger = Logger.getLogger(ParseKotlin::class.java)
     }
 
+    private fun findImportList(astList: List<Ast>): List<String>? {
+
+        val result = mutableListOf<String>()
+        astList.forEach { ast->
+            (ast as? DefaultAstNode)?.let { defaultAstNode ->
+                if(defaultAstNode.description == "importList"){
+                    defaultAstNode.children.forEach { child->(child as? Import)?.let { importStatement ->
+                        result.add(importStatement.identifier.identifierName())
+                    } }
+                }
+            }
+        }
+
+        return result
+    }
+
     fun parse(filePath: String): List<Type> {
         val kotlinFile = KotlinGrammarAntlrKotlinParser.parseKotlinFile(AstSource.File(filePath))
         val result = mutableListOf<Type>()
         kotlinFile.summary(false).onSuccess { astList->
+
+            val imports = findImportList(astList)
 
             var pkg: PackageHeader? = null
 
@@ -35,6 +56,7 @@ class ParseKotlin {
                     val type = Type(it.identifier?.rawName ?: "", pkg?.identifier?.get(0)?.rawName ?: "",
                         if(it.keyword == "interface") {TypeType.Interface } else { TypeType.Class }
                         )
+                    type.imports = imports
 
                     handleClassDeclaration(it, type, result)
                     result.add(type)

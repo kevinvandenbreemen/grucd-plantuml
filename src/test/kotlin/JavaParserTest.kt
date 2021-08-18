@@ -186,4 +186,19 @@ class JavaParserTest {
         relation.to.name shouldBeEqualTo "Interface"
     }
 
+    @Test
+    fun `should handle multiple classes with the same name`() {
+        val parser = ParseJava()
+        val main = parser.parse("src/test/resources/multiname/MainThing.java")[0]
+        val thing1 = parser.parse("src/test/resources/multiname/thing1/Thing.java")[0]
+        val thing2 = parser.parse("src/test/resources/multiname/thing2/Thing.java")[0]
+
+        val model = ModelBuilder().build(listOf(main, thing1, thing2))
+
+        model.relations.size shouldBeEqualTo 1
+        val relation = model.relations[0]
+        relation.from shouldBeEqualTo main
+        relation.to shouldBeEqualTo thing1
+    }
+
 }

@@ -9,28 +9,80 @@ import java.util.*;
  */
 public class ModelBuilder {
 
+    /**
+     * Attempts to find the type to which a given name refers by looking through the imports into the from type
+     * @param from      Type
+     * @param allTypes  All types in the software system being documented
+     * @param toName    Name of type being referenced by the from type
+     * @return          Optional containing a type if it exists
+     */
+    private Optional<Type> findTypeBasedOnImports(Type from, List<Type> allTypes, String toName) {
+        return allTypes.stream().filter(type -> {
+            if(type.getName().equals(toName)) {
+
+                if(type.getPkg().equals(from.getPkg())) {
+                    return false;
+                }
+
+                String expectedImportName = type.getPkg()+"."+type.getName();
+                if(from.getImports().stream().filter(i->i.equals(expectedImportName)).findAny().isPresent()) {
+                    return true;
+                }
+
+            }
+
+            return false;
+
+        }).findFirst();
+    }
+
+    /**
+     * Attempts to find the type with the given name in the software system
+     * @param from
+     * @param allTypes
+     * @param toName
+     * @return
+     */
+    private Optional<Type> findTypeBasedOnName(Type from, List<Type> allTypes, String toName) {
+        return allTypes.stream().filter(type -> {
+            return type.getName().equals(toName) && type != from;
+        }).findFirst();
+    }
+
+    /**
+     * Search for the type with the given name
+     * @param from
+     * @param allTypes
+     * @param name
+     * @return
+     */
+    private Optional<Type> findAppropriateType(Type from, List<Type> allTypes, String name) {
+        Optional<Type> found = findTypeBasedOnImports(from, allTypes, name);
+        if(found.isPresent()) {
+            return found;
+        }
+
+        return findTypeBasedOnName(from, allTypes, name);
+    }
+
     public Model build(List<Type> types) {
         Model model = new Model(types);
 
         Map<Type, AbstractSet<Type>> encapsulations = new HashMap<>();
         types.forEach(type -> {
-            types.forEach(targetType->{
-                if(type != targetType) {
+            type.getFields().forEach(field -> {
 
-                    type.getFields().forEach(field -> {
-                        if(field.getTypeName().equals(targetType.getName())) {
-                            AbstractSet<Type> targets = encapsulations.computeIfAbsent(type, type1 -> new HashSet<>());
-                            targets.add(targetType);
-                        }
-                        field.getTypeArguments().forEach(arg->{
-                            if(arg.equals(targetType.getName())) {
-                                AbstractSet<Type> targets = encapsulations.computeIfAbsent(type, type1 -> new HashSet<>());
-                                targets.add(targetType);
-                            }
-                        });
+                findAppropriateType(type, types, field.getTypeName()).ifPresent(targetType->{
+                    AbstractSet<Type> targets = encapsulations.computeIfAbsent(type, type1 -> new HashSet<>());
+                    targets.add(targetType);
+                });
+
+                field.getTypeArguments().forEach(arg->{
+                    findAppropriateType(type, types, arg).ifPresent(targetType->{
+                        AbstractSet<Type> targets = encapsulations.computeIfAbsent(type, type1 -> new HashSet<>());
+                        targets.add(targetType);
                     });
-
-                }
+                });
             });
         });
 
@@ -42,8 +94,7 @@ public class ModelBuilder {
 
         types.forEach(type -> {
             type.getSuperTypeNames().forEach(superTypeName->{
-                types.stream().filter(t->t.getName().equals(superTypeName)).findFirst().ifPresent(superType->{
-
+                findAppropriateType(type, types, superTypeName).ifPresent(superType->{
                     if(superType.getType() == TypeType.Interface) {
                         model.addRelation(new TypeRelation(type, superType, RelationType.implementation));
                     } else {
@@ -55,7 +106,7 @@ public class ModelBuilder {
 
         types.forEach(type->{
             type.getInterfaceNames().forEach(interfaceName->{
-                types.stream().filter(t->t.getName().equals(interfaceName)).findFirst().ifPresent(intrface->{
+                findAppropriateType(type, types, interfaceName).ifPresent(intrface->{
                     model.addRelation(new TypeRelation(type, intrface, RelationType.implementation));
                 });
             });

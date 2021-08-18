@@ -77,6 +77,13 @@ internal class KotlinParserTest {
     }
 
     @Test
+    fun `should parse imports to a type`() {
+        val types = ParseKotlin().parse("src/test/resources/kotlin/Importer.kt")
+        types[0].imports.shouldNotBeEmpty()
+        types[0].imports[0] shouldBeEqualTo "java.util.ArrayList"
+    }
+
+    @Test
     fun `should parse method on a class`() {
         val types = ParseKotlin().parse("src/test/resources/kotlin/KotlinClass.kt")
         val type = types[0]

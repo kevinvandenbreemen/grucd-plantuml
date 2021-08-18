@@ -18,6 +18,11 @@ public class Type {
 
     private TypeType type;
 
+    /**
+     * The imports to this type
+     */
+    private List<String> imports;
+
     private Type parentType;    //  For nested classes
 
     /**
@@ -90,6 +95,14 @@ public class Type {
 
     public void addInterface(String name) {
         this.interfaceNames.add(name);
+    }
+
+    public void setImports(List<String> imports) {
+        this.imports = imports;
+    }
+
+    public List<String> getImports() {
+        return imports;
     }
 
     public List<String> getInterfaceNames() {

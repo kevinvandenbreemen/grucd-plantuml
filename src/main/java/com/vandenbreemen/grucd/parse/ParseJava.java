@@ -3,6 +3,7 @@ package com.vandenbreemen.grucd.parse;
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ParseResult;
 import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.ImportDeclaration;
 import com.github.javaparser.ast.Modifier;
 import com.github.javaparser.ast.body.*;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
@@ -42,9 +43,17 @@ public class ParseJava {
 
 
             unit.getResult().ifPresent(new Consumer<>() {
+
+                ArrayList<String> imports = new ArrayList<>();
+
                 @Override
                 public void accept(CompilationUnit unit) {
                     unit.accept(new VoidVisitorAdapter<VisitorContext>() {
+
+                        @Override
+                        public void visit(ImportDeclaration importDeclaration, VisitorContext arg) {
+                            imports.add(importDeclaration.getNameAsString());
+                        }
 
                         @Override
                         public void visit(ClassOrInterfaceDeclaration n, VisitorContext visitorContext) {
@@ -61,6 +70,7 @@ public class ParseJava {
                             });
 
                             Type currentType = new Type(n.getNameAsString(), packageName[0], n.isInterface() ? TypeType.Interface : TypeType.Class);
+                            currentType.setImports(imports);
 
                             if(visitorContext != null) {
                                 currentType.setParentType(visitorContext.parentType);
