@@ -216,4 +216,18 @@ class JavaParserTest {
                 "test a new line"
     }
 
+    @Test
+    fun `should parse javadoc on nested classes`() {
+        val types = ParseJava().parse("src/test/resources/encapsulation.test/NestedClass.java")
+        types[0].classDoc shouldBeEqualTo "Main Class"
+        types[1].classDoc shouldBeEqualTo "Nested Class"
+    }
+
+    @Test
+    fun `should parse javadoc on two classes in same file`() {
+        val types = ParseJava().parse("src/test/resources/encapsulation.test/Encapsulation.java")
+        types[0].classDoc shouldBeEqualTo "Containing Class"
+        types[1].classDoc shouldBeEqualTo "Encapsulated Class"
+    }
+
 }

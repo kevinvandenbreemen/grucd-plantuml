@@ -1,5 +1,11 @@
+/**
+ * Main Class
+ */
 class MainClass {
 
+    /**
+     * Nested Class
+     */
     class NestedClass {
         public String getName() {
             return "Nested";
