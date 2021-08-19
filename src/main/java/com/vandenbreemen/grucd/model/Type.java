@@ -35,6 +35,8 @@ public class Type {
      */
     private List<String> interfaceNames;
 
+    private String classDoc;
+
     public Type(String name, String pkg, TypeType type) {
         this.name = name;
         this.pkg = pkg;
@@ -107,6 +109,14 @@ public class Type {
 
     public List<String> getInterfaceNames() {
         return interfaceNames;
+    }
+
+    public String getClassDoc() {
+        return classDoc;
+    }
+
+    public void setClassDoc(String classDoc) {
+        this.classDoc = classDoc;
     }
 
     @Override

@@ -1,3 +1,6 @@
+/**
+ * Java test class for unit testing
+ */
 public class TestJava {
 
     public int publicInt;

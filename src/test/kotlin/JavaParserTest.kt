@@ -201,4 +201,12 @@ class JavaParserTest {
         relation.to shouldBeEqualTo thing1
     }
 
+    @Test
+    fun `should read javadoc on a class`() {
+        val types = ParseJava().parse("src/test/resources/TestJava.java")
+        val type = types[0]
+
+        type.classDoc shouldBeEqualTo "Java test class for unit testing"
+    }
+
 }

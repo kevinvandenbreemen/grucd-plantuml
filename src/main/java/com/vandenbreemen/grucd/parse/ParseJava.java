@@ -6,6 +6,7 @@ import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.ImportDeclaration;
 import com.github.javaparser.ast.Modifier;
 import com.github.javaparser.ast.body.*;
+import com.github.javaparser.ast.comments.JavadocComment;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 import com.vandenbreemen.grucd.model.Parameter;
@@ -53,6 +54,13 @@ public class ParseJava {
                         @Override
                         public void visit(ImportDeclaration importDeclaration, VisitorContext arg) {
                             imports.add(importDeclaration.getNameAsString());
+                        }
+
+                        @Override
+                        public void visit(JavadocComment n, VisitorContext classContext) {
+                            logger.trace("Found javadoc comment:\n"+n.parse().toText());
+                            classContext.parentType.setClassDoc(n.parse().toText().trim());
+                            super.visit(n, classContext);
                         }
 
                         @Override
