@@ -209,4 +209,11 @@ class JavaParserTest {
         type.classDoc shouldBeEqualTo "Java test class for unit testing"
     }
 
+    @Test
+    fun `should not mix up javadoc`() {
+        val types = ParseJava().parse("src/test/resources/pkg/test/PackageTest.java")
+        types[0].classDoc shouldBeEqualTo "Class javadoc\n" +
+                "test a new line"
+    }
+
 }
