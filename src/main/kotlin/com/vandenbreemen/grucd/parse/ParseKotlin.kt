@@ -144,6 +144,25 @@ class ParseKotlin {
         return "unknown"
     }
 
+    private fun findParameters(declaration: KlassDeclaration, field: Field) {
+        declaration.type.forEach { typeIdentifier->
+            typeIdentifier.parameter.forEach { typeParam->
+                field.addTypeArgument(typeParam.identifier)
+            }
+        }
+        declaration.children.forEach { child->
+            if(child.description == "genericCallLikeComparison" && child is DefaultAstNode) {
+                child.children.filter { c->c is DefaultAstNode && c.description == "callSuffix" }.firstOrNull()?.let { callSuffix->
+                    (callSuffix as? DefaultAstNode)?.let { callSuffixDefault->
+                        callSuffixDefault.children.forEach { cfdChild->(cfdChild as? KlassIdentifier)?.let { cfdIdentifier->
+                            field.addTypeArgument(cfdIdentifier.identifier)
+                        } }
+                    }
+                }
+            }
+        }
+    }
+
     private fun processPropertyDeclaration(
         declaration: KlassDeclaration,
         type: Type
@@ -161,7 +180,9 @@ class ParseKotlin {
 
         val modifier = getVisibilityModifier(declaration)
 
-        type.addField(Field(name, parmType, modifier))
+        type.addField(Field(name, parmType, modifier).apply {
+            findParameters(declaration, this)
+        })
     }
 
     private fun getVisibilityModifier(declaration: KlassDeclaration): Visibility {

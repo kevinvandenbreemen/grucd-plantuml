@@ -33,6 +33,36 @@ internal class KotlinParserTest {
     }
 
     @Test
+    fun `should parse class with parametrized field`() {
+        val types = ParseKotlin().parse("src/test/resources/kotlin/ClassWithListOfEncapsulated.kt")
+        types.size shouldBeEqualTo 2
+
+        val type = types[0]
+        type.fields.size shouldBeEqualTo 1
+
+        val model = ModelBuilder().build(types)
+        model.relations.shouldNotBeEmpty()
+        model.relations[0].from shouldBeEqualTo model.types[0]
+        model.relations[0].to shouldBeEqualTo model.types[1]
+        model.relations[0].type shouldBeEqualTo RelationType.encapsulates
+    }
+
+    @Test
+    fun `should parse class with parametrized field declaration`() {
+        val types = ParseKotlin().parse("src/test/resources/kotlin/ClassWithListOfEncapsulatedDeclared.kt")
+        types.size shouldBeEqualTo 2
+
+        val type = types[0]
+        type.fields.size shouldBeEqualTo 1
+
+        val model = ModelBuilder().build(types)
+        model.relations.shouldNotBeEmpty()
+        model.relations[0].from shouldBeEqualTo model.types[0]
+        model.relations[0].to shouldBeEqualTo model.types[1]
+        model.relations[0].type shouldBeEqualTo RelationType.encapsulates
+    }
+
+    @Test
     fun `should determine the package name of a Kotlin class`() {
         val types = ParseKotlin().parse("src/test/resources/kotlin/KotlinClass.kt")
         types[0].pkg shouldBeEqualTo "kotlin"
