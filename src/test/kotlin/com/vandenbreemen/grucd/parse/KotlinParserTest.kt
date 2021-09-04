@@ -248,6 +248,12 @@ internal class KotlinParserTest {
     }
 
     @Test
+    fun `should parse javadoc on a kotlin class`() {
+        val types = ParseKotlin().parse("src/test/resources/kotlin/KotlinClass.kt")
+        types[0].classDoc shouldBeEqualTo "Unit test Kotlin Class"
+    }
+
+    @Test
     fun `learning test to parse Kotlin with kotlinx dot ast`() {
 
 

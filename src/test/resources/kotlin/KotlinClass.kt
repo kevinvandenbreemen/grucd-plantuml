@@ -1,5 +1,8 @@
 package kotlin
 
+/**
+ * Unit test Kotlin Class
+ */
 class KotlinClass(name: String) {
 
     fun requireParams(){}
