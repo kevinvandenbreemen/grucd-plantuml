@@ -254,6 +254,15 @@ internal class KotlinParserTest {
     }
 
     @Test
+    fun `should parse javadoc on nested classes`() {
+        val types = ParseKotlin().parse("src/test/resources/kotlin/ClassWithANestedClass.kt")
+        types.size shouldBeEqualTo 2
+
+        types[1].classDoc shouldBeEqualTo "Parent Class"
+        types[0].classDoc shouldBeEqualTo "Nested Class"
+    }
+
+    @Test
     fun `learning test to parse Kotlin with kotlinx dot ast`() {
 
 

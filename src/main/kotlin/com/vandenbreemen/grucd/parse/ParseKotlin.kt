@@ -17,7 +17,31 @@ import org.apache.log4j.NDC
 class ParseKotlin {
 
     enum class ItemTypeToFind {
-        KotlinDoc
+        KotlinDoc,
+        NestedClassToKotlinDoc
+    }
+
+    private open class AstSearchResult<T>(val result: T)
+    private class MapAstSearchResult(map: MutableMap<String, DefaultAstTerminal>): AstSearchResult<MutableMap<String, DefaultAstTerminal>>(map)
+
+    private class SearchContext {
+        var tabs: String = ""
+        var lastComment: DefaultAstTerminal? = null
+        val classNameToComment: MutableMap<String, DefaultAstTerminal> = mutableMapOf()
+
+        fun tabIn(): SearchContext {
+            tabs += "\t"
+            return this
+        }
+
+        fun tabOut(): SearchContext {
+            tabs = tabs.substring(0, tabs.length - "\t".length)
+            return this
+        }
+
+        override fun toString(): String {
+            return "[SearchContext - lastCmt=$lastComment, classNameToCmnt=$classNameToComment]"
+        }
     }
 
     companion object {
@@ -40,43 +64,88 @@ class ParseKotlin {
         return result
     }
 
-    fun visitAll(ast: Ast, toFind: ItemTypeToFind): Ast? {
+    private fun visitAll(ast: Ast, toFind: ItemTypeToFind, searchContext: SearchContext? = null): AstSearchResult<out Any>? {
+
+        var currentSearchContext = searchContext ?: SearchContext()
+        val tab = searchContext?.tabs ?: ""
+
+        logger.debug("${tab}VISIT ${ast.javaClass.simpleName}(${ast.description}) - context=$currentSearchContext ($toFind)")
 
         (ast as? AstWithAttachments)?.run {
-            logger.trace("Handling attachments for ${ast.javaClass.simpleName} ${ast.description}=~=~=~=~")
-            attachments.attachments.entries.forEach { entry->
-                when(entry.value) {
-                    is RawAst -> visitAll((entry.value as RawAst).ast, toFind)?.let { found-> return found }
-                    else -> (entry.value as? Ast)?.run { visitAll(this, toFind)?.let { found->return found } } ?.run { logger.trace("unkn: ${entry.value}") }
+            logger.trace("${tab}Handling attachments for ${ast.javaClass.simpleName} ${ast.description}=~=~=~=~")
+            attachments.attachments.entries.forEach { entry ->
+                when (entry.value) {
+                    is RawAst -> {
+                        visitAll(
+                            (entry.value as RawAst).ast,
+                            toFind,
+                            currentSearchContext.tabIn()
+                        )?.let { found ->
+                            if(found !is MapAstSearchResult)
+                            return found
+                        }
+                        currentSearchContext.tabOut()
+                    }
+                    else -> (entry.value as? Ast)?.run {
+                        visitAll(this, toFind, currentSearchContext.tabIn())?.let { found ->
+                            if(found !is MapAstSearchResult)
+                            return found
+                        }
+                        currentSearchContext.tabOut()
+                    }?.run { logger.trace("${tab}unkn: ${entry.value}") }
                 }
 
             }
-            logger.trace("END attachments =~=~=~=~")
+            logger.trace("${tab}END attachments =~=~=~=~")
+
         }
 
-        when(ast) {
+        when (ast) {
             is KlassDeclaration -> {
-                logger.trace("kw=${ast.keyword}")
+                logger.trace("${tab}kw=${ast.keyword}")
+                if (ast.keyword == "class") {
+                    currentSearchContext.run {
+                        lastComment?.let { lastCmnt ->
+                            ast?.identifier?.let { ident ->
+                                logger.trace("${tab}Attaching comment to ${ident.identifier}")
+                                this.classNameToComment[ident.identifier] = lastCmnt
+                            }
+                        }
+                    }
+                }
                 for (child in ast.children) {
-                    visitAll(child, toFind)?.let { found->return found }
+                    visitAll(child, toFind, currentSearchContext.tabIn())?.let { found ->
+                        if(found !is MapAstSearchResult)
+                         return found
+                    }
+                    currentSearchContext.tabOut()
                 }
             }
             is AstNode -> {
-                logger.trace("AstNode:  ${ast.description}")
+                logger.trace("${tab}AstNode:  ${ast.description}")
                 for (child in ast.children) {
-                    visitAll(child, toFind)?.let { found->return found }
+                    visitAll(child, toFind, currentSearchContext.tabIn())?.let { found ->
+                        if(found !is MapAstSearchResult)
+                        return found
+                    }
+                    currentSearchContext.tabOut()
                 }
             }
             is DefaultAstTerminal -> {
-                if(ast.description == "DelimitedComment" ){
-                    logger.trace("Found comment ${ast.text}")
-                    if(toFind == ItemTypeToFind.KotlinDoc) {
-                        return ast
+                if (ast.description == "DelimitedComment") {
+                    logger.trace("${tab}Found comment ${ast.text}")
+                    currentSearchContext.lastComment = ast
+                    if (toFind == ItemTypeToFind.KotlinDoc) {
+                        return AstSearchResult(ast)
                     }
                 }
             }
             else ->
-                logger.trace("Unknown: ${ast.description}")
+                logger.trace("${tab}Unknown: ${ast.description}")
+        }
+
+        if(toFind == ItemTypeToFind.NestedClassToKotlinDoc) {
+            return MapAstSearchResult(currentSearchContext.classNameToComment)
         }
 
         return null
@@ -98,27 +167,34 @@ class ParseKotlin {
                 logger.debug("VISIT TREE FOR ${astItem.description}")
                 logger.debug("=======================================")
                 visitAll(astItem, ItemTypeToFind.KotlinDoc)?.let { comment->
-                    (comment as? DefaultAstTerminal)?.let { commentTerm->
-                        classComment = commentTerm.text.replace(Regex("([/][*]+)"), "")
+                    (comment as? AstSearchResult<DefaultAstTerminal>)?.let { commentTerm->
+                        classComment = comment.result.text.replace(Regex("([/][*]+)"), "")
                             .replace(Regex("([*]+[/])"), "")
                             .replace(Regex("^\\s*[*]"), "").trim()
                     }
                 }
-                logger.debug("=======================================")
+                logger.debug("END VISIT TREE\n\n\n")
 
                 (astItem as? PackageHeader)?.let {
                     pkg = it
                 }
 
                 (astItem as? KlassDeclaration)?.let {
-
                     val type = Type(it.identifier?.rawName ?: "", pkg?.identifier?.get(0)?.rawName ?: "",
                         if(it.keyword == "interface") {TypeType.Interface } else { TypeType.Class }
                         )
                     type.imports = imports
 
                     handleClassDeclaration(it, type, result)
-                    classComment?.let { comment->type.classDoc = comment }
+                    classComment?.let { comment->type.classDoc = comment } ?: run {
+                        visitAll(astItem, ItemTypeToFind.KotlinDoc)?.let { comment ->
+                            (comment as? DefaultAstTerminal)?.let { commentTerm ->
+                                classComment = commentTerm.text.replace(Regex("([/][*]+)"), "")
+                                    .replace(Regex("([*]+[/])"), "")
+                                    .replace(Regex("^\\s*[*]"), "").trim()
+                            }
+                        }
+                    }
                     result.add(type)
 
                 }
@@ -129,6 +205,8 @@ class ParseKotlin {
     }
 
     private fun handleClassDeclaration(declaration: KlassDeclaration, type: Type, classList: MutableList<Type>) {
+
+        val nestedClassesToJavadoc = visitAll(declaration, ItemTypeToFind.NestedClassToKotlinDoc)
 
         logger.debug("Parsing ${type.type} ${type.name}...")
         NDC.push(type.name)
@@ -181,6 +259,13 @@ class ParseKotlin {
                                 declaration.identifier?.rawName?.let { nestedTypeName ->
                                     val nestedType = Type(nestedTypeName, type.pkg)
                                     nestedType.parentType = type
+                                    (nestedClassesToJavadoc as? MapAstSearchResult)?.let { result->
+                                        result.result[nestedTypeName]?.let { commentNode->
+                                            nestedType.classDoc = commentNode.text.replace(Regex("([/][*]+)"), "")
+                                                .replace(Regex("([*]+[/])"), "")
+                                                .replace(Regex("^\\s*[*]"), "").trim()
+                                        }
+                                    }
                                     handleClassDeclaration(declaration, nestedType, classList)
                                     classList.add(nestedType)
                                 }

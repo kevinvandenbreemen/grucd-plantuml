@@ -1,7 +1,13 @@
 package kotlin
 
+/**
+ * Parent class
+ */
 class ClassWithANestedClass {
 
+    /**
+     * Nested class
+     */
     class NestedClass {
 
         val someValue: String = ""
