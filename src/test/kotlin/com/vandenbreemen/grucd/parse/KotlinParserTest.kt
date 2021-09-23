@@ -258,8 +258,11 @@ internal class KotlinParserTest {
         val types = ParseKotlin().parse("src/test/resources/kotlin/ClassWithANestedClass.kt")
         types.size shouldBeEqualTo 2
 
-        types[1].classDoc shouldBeEqualTo "Parent Class"
-        types[0].classDoc shouldBeEqualTo "Nested Class"
+        println(types[1].name)
+        println(types[0].name)
+
+        types[1].classDoc shouldBeEqualTo "Parent class"
+        types[0].classDoc shouldBeEqualTo "Nested class"
     }
 
     @Test
