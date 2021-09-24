@@ -33,12 +33,19 @@ internal class KotlinParserTest {
     }
 
     @Test
-    fun `should parse a kotlin enums`() {
+    fun `should parse a kotlin enum`() {
         val types = ParseKotlin().parse("src/test/resources/kotlin/EnumExample.kt")
         types.shouldNotBeEmpty()
         types.size shouldBeEqualTo 1
         types[0].name shouldBeEqualTo "EnumExample"
         types[0].fields.size shouldBeEqualTo 2
+    }
+
+    @Test
+    fun `should parse multiple enums in same file`() {
+        val types = ParseKotlin().parse("src/test/resources/kotlin/MultiEnum.kt")
+        types.shouldNotBeEmpty()
+        types.size shouldBeEqualTo 2
     }
 
     @Test
