@@ -130,10 +130,34 @@ class ParseKotlin {
         return result
     }
 
+    private fun handleEnumClassDeclaration(declaration: KlassDeclaration, type: Type) {
+        declaration.children.firstOrNull { c->c.description == "enumClassBody" } ?.let { enumClassBody->
+            (enumClassBody as? DefaultAstNode)?.let { enumClassNode->
+                enumClassNode.children.firstOrNull { c-> c is DefaultAstNode && c.description == "enumEntries" }?.let { enumEntries->
+                    (enumEntries as DefaultAstNode).children.filter { e-> e is DefaultAstNode && e.description == "enumEntry" }.forEach { entry->
+                        (entry as DefaultAstNode).children.firstOrNull { e-> e is DefaultAstNode && e.description == "simpleIdentifier" }?.let { ident->
+                            (ident as DefaultAstNode).children.firstOrNull { ic->ic is DefaultAstTerminal && ic.description == "Identifier" }?.let { ident->
+                                (ident as DefaultAstTerminal).let {
+                                    type.addField(Field(it.text, type.name, Visibility.Public))
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+    }
+
     private fun handleClassDeclaration(declaration: KlassDeclaration, type: Type, classList: MutableList<Type>, discoveredClassComment: String? = null) {
 
         discoveredClassComment?.let { previouslyFoundComment->
             type.classDoc = previouslyFoundComment
+        }
+
+        if(declaration.modifiers.firstOrNull { item->item.modifier == "enum" } != null) {
+            handleEnumClassDeclaration(declaration, type)
+            return
         }
 
         val classCommentOnNextNestedType = visitAll(declaration, ItemTypeToFind.KotlinDoc)?.let { comment->
