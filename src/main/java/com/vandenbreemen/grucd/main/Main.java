@@ -11,8 +11,7 @@ import com.vandenbreemen.grucd.render.plantuml.PlantUMLScriptGenerator;
 import com.vandenbreemen.kevincommon.cmd.CommandLineParameters;
 import org.apache.log4j.Logger;
 
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -30,9 +29,10 @@ public class Main {
         new SystemInfo().print();
 
         CommandLineParameters params = new CommandLineParameters(args);
-        params.addRequired("o", "Where to store the resulting class diagram SVG file");
+        params.addRequired("o", "Where to store the resulting class diagram SVG file or script");
         params.addAtLeast("f", "(or else -d) file you wish to parse and generate UML of");
         params.addAtLeast("d", "(or else -f) directory you wish to parse and generate UML of");
+        params.addAtLeast("p", "store plantuml script used to generate diagram to output file but do nothing else");
         if(!params.validate()) {
             System.out.println(params.document());
             return;
@@ -83,6 +83,21 @@ public class Main {
 
         PlantUMLScriptGenerator generator = new PlantUMLScriptGenerator();
         String script = generator.render(model);
+
+        if(params.flag("p")) {
+            System.out.println(script);
+
+            try {
+                try (PrintStream stream = new PrintStream(new FileOutputStream(outputPath))) {
+                    stream.println(script);
+                }
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                System.exit(1);
+            }
+
+            System.exit(0);
+        }
 
         String svgData = renderer.renderSVG(script);
 

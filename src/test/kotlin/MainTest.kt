@@ -14,4 +14,9 @@ class MainTest {
         Main.main(arrayOf("-d", "src/main/", "-o", "./testOutput/grucd.svg"))
     }
 
+    @Test
+    fun `should dump plantuml code for source directory on command`() {
+        Main.main(arrayOf("-d", "src/main/", "-o", "./testOutput/grucd.dat", "-p"))
+    }
+
 }
