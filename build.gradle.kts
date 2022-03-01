@@ -6,7 +6,7 @@ plugins {
 val versionRaw = File("src/main/resources/version.properties")
 val versionNumber = versionRaw.readText()
 
-group = "org.example"
+group = "com.vandenbreemen"
 version = versionNumber
 
 repositories {

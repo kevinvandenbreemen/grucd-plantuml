@@ -33,6 +33,7 @@ public class Main {
         params.addAtLeast("f", "(or else -d) file you wish to parse and generate UML of");
         params.addAtLeast("d", "(or else -f) directory you wish to parse and generate UML of");
         params.addAtLeast("p", "store plantuml script used to generate diagram to output file but do nothing else");
+        params.addAtLeast("u", "Print names of all un-used types or interfaces in the codebase and exit");
         if(!params.validate()) {
             System.out.println(params.document());
             return;
@@ -97,6 +98,10 @@ public class Main {
             }
 
             System.exit(0);
+        } else if (params.flag("u")) {
+            System.out.println("UNUSED TYPES IN CODEBASE:\n");
+            model.getUnusedTypes().forEach((type -> System.out.println(type)));
+            return;
         }
 
         String svgData = renderer.renderSVG(script);

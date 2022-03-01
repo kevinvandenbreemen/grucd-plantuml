@@ -19,4 +19,9 @@ class MainTest {
         Main.main(arrayOf("-d", "src/main/", "-o", "./testOutput/grucd.dat", "-p"))
     }
 
+    @Test
+    fun `should dump list of unused classes`() {
+        Main.main(arrayOf("-d", "src/main/", "-o", "./testOutput/grucd.dat", "-u"))
+    }
+
 }
