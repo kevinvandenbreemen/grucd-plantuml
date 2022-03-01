@@ -230,4 +230,15 @@ class JavaParserTest {
         types[1].classDoc shouldBeEqualTo "Encapsulated Class"
     }
 
+    @Test
+    fun `should detect unused type`() {
+        val types = ParseJava().parse("src/test/resources/unused/UnusedClassExample.java");
+
+        val model = ModelBuilder().build(types)
+
+        model.unusedTypes.shouldNotBeEmpty()
+        model.unusedTypes.size shouldBeEqualTo 1
+        model.unusedTypes[0].name shouldBeEqualTo "UnusedClass"
+    }
+
 }

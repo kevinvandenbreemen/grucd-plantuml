@@ -67,6 +67,7 @@ public class ModelBuilder {
 
     public Model build(List<Type> types) {
         Model model = new Model(types);
+        List<Type> unusedTypes = new ArrayList<>(types);    //  Remove items as we find associative targets
 
         Map<Type, AbstractSet<Type>> encapsulations = new HashMap<>();
         types.forEach(type -> {
@@ -114,10 +115,12 @@ public class ModelBuilder {
 
         encapsulations.entrySet().forEach(relationSet->{
             relationSet.getValue().forEach(target->{
+                unusedTypes.remove(target);
                 model.addRelation(new TypeRelation(relationSet.getKey(), target, RelationType.encapsulates));
             });
         });
 
+        model.setUnusedTypes(unusedTypes);
         return model;
 
     }
