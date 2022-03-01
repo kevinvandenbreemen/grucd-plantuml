@@ -94,10 +94,10 @@ public class Main {
                 }
             } catch (Exception ex) {
                 ex.printStackTrace();
-                System.exit(1);
+                return;
             }
 
-            System.exit(0);
+            return;
         } else if (params.flag("u")) {
             System.out.println("UNUSED TYPES IN CODEBASE:\n");
             model.getUnusedTypes().forEach((type -> System.out.println(type)));
