@@ -108,6 +108,7 @@ public class ModelBuilder {
         types.forEach(type->{
             type.getInterfaceNames().forEach(interfaceName->{
                 findAppropriateType(type, types, interfaceName).ifPresent(intrface->{
+                    unusedTypes.remove(intrface);
                     model.addRelation(new TypeRelation(type, intrface, RelationType.implementation));
                 });
             });

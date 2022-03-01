@@ -241,4 +241,15 @@ class JavaParserTest {
         model.unusedTypes[0].name shouldBeEqualTo "UnusedClass"
     }
 
+    @Test
+    fun `should detect unused types in the form of unimplemented interfaces`() {
+        val types = ParseJava().parse("src/test/resources/unused/UnusedInterfaces.java");
+
+        val model = ModelBuilder().build(types)
+
+        model.unusedTypes.shouldNotBeEmpty()
+        model.unusedTypes.size shouldBeEqualTo 1
+        model.unusedTypes[0].name shouldBeEqualTo "UnusedInterface"
+    }
+
 }
