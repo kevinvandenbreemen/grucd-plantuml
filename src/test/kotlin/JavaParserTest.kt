@@ -252,4 +252,15 @@ class JavaParserTest {
         model.unusedTypes[0].name shouldBeEqualTo "UnusedInterface"
     }
 
+    @Test
+    fun `should detect unused type in the form of un-extended classes`() {
+        val types = ParseJava().parse("src/test/resources/unused/UnusedSuperExample.java");
+
+        val model = ModelBuilder().build(types)
+
+        model.unusedTypes.shouldNotBeEmpty()
+        model.unusedTypes.size shouldBeEqualTo 1
+        model.unusedTypes[0].name shouldBeEqualTo "StandsAlone"
+    }
+
 }
