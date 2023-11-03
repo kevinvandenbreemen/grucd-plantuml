@@ -6,6 +6,19 @@ import net.sourceforge.plantuml.SourceStringReader
 import java.io.ByteArrayOutputStream
 import java.nio.charset.Charset
 
+class PlantUmlDirectRenderer {
+
+    fun render(source: String): String {
+        val reader = SourceStringReader(source)
+        val os = ByteArrayOutputStream()
+        val description = reader.outputImage(os, FileFormatOption(FileFormat.SVG))
+        os.close()
+
+        return String(os.toByteArray(), Charset.forName("UTF-8"))
+    }
+
+}
+
 fun main(args: Array<String>) {
 
     val source = """

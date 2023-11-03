@@ -1,6 +1,7 @@
 import com.vandenbreemen.grucd.builder.ModelBuilder
 import com.vandenbreemen.grucd.model.*
 import com.vandenbreemen.grucd.render.plantuml.PlantUMLScriptGenerator
+import com.vandenbreemen.grucd.render.plantuml.PlantUmlDirectRenderer
 import org.amshove.kluent.shouldContain
 import org.junit.jupiter.api.Test
 
@@ -48,7 +49,7 @@ class PlantUMLScriptGeneratorTest {
     }
 
     @Test
-    fun `should generate diagram with a encapsulation in it`() {
+    fun `should generate and render diagram with a encapsulation in it`() {
         val type = Type("TestClass", "com.test.types")
         type.addField(Field("myString", "String", Visibility.Public))
         val method = Method("getData", "String")
@@ -64,6 +65,8 @@ class PlantUMLScriptGeneratorTest {
         println(script)
 
         script.shouldContain("ContainingClass o--> TestClass")
+
+        println(PlantUmlDirectRenderer().render(script))
     }
 
     @Test

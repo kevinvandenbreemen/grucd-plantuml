@@ -6,9 +6,11 @@ class PlantUMLRenderingTest {
     @Test
     fun `should render SVG file`() {
         val classDiagram = """
+            @startuml
             class TestClass {
             	+ myString: String
             }
+            @enduml
         """.trimIndent()
 
         println(PlantUMLRenderer().renderSVG(classDiagram))

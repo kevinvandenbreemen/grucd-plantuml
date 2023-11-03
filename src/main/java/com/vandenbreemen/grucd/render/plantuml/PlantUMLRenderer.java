@@ -13,8 +13,7 @@ public class PlantUMLRenderer {
     public String renderSVG(String script) {
 
         logger.debug("Rendering PlantUML script:\n----------------------------------\n" + script + "\n----------------------------------");
-
-        return SvgGeneratorService.getInstance().generateSvgFromPlantUml(script);
+        return new PlantUmlDirectRenderer().render(script);
     }
 
 }
