@@ -28,6 +28,10 @@ dependencies {
     val plantUmlVersion = "1.0.48"
     implementation("com.credibledoc:plantuml-core:$plantUmlVersion")
 
+    val plantUmlLibVersion = "1.0.0.0"
+    implementation("com.github.kevinvandenbreemen:plantuml-kevin:$plantUmlLibVersion")
+
+
     val log4jVersion = "1.2.14"
     implementation("log4j:log4j:$log4jVersion")
 
