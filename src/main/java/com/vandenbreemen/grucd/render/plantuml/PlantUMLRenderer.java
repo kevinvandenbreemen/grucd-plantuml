@@ -1,6 +1,5 @@
 package com.vandenbreemen.grucd.render.plantuml;
 
-import com.credibledoc.plantuml.svggenerator.SvgGeneratorService;
 import org.apache.log4j.Logger;
 
 /**
