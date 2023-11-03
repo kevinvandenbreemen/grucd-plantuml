@@ -44,7 +44,7 @@ val fatJar = task("FatJar", type = Jar::class) {
 
     val jarName = "grucd.jar"
 
-    archiveName = jarName
+    archiveFileName.set(jarName)
     duplicatesStrategy = DuplicatesStrategy.INCLUDE
     manifest {
         attributes["Main-Class"] = "com.vandenbreemen.grucd.main.Main"
