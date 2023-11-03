@@ -25,7 +25,7 @@ dependencies {
     val kluentVersion = "1.68"
     testImplementation("org.amshove.kluent:kluent:$kluentVersion")
 
-    val plantUmlVersion = "1.0.39"
+    val plantUmlVersion = "1.0.48"
     implementation("com.credibledoc:plantuml-core:$plantUmlVersion")
 
     val log4jVersion = "1.2.14"
