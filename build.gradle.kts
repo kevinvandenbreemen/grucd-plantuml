@@ -1,6 +1,8 @@
 plugins {
     kotlin("jvm") version "1.5.10"
     java
+    `maven-publish`
+    `java-library`
 }
 
 val versionRaw = File("src/main/resources/version.properties")
@@ -65,4 +67,19 @@ val fatJar = task("FatJar", type = Jar::class) {
 
 tasks.getByName<Test>("test") {
     useJUnitPlatform()
+}
+
+//  Based on https://github.com/gradle/kotlin-dsl-samples/blob/master/samples/maven-publish/build.gradle.kts
+val sourcesJar by tasks.registering(Jar::class) {
+    classifier = "sources"
+    from(sourceSets.main.get().allSource)
+}
+
+publishing {
+    publications {
+        register("mavenJava", MavenPublication::class) {
+            from(components["java"])
+            artifact(sourcesJar.get())
+        }
+    }
 }
