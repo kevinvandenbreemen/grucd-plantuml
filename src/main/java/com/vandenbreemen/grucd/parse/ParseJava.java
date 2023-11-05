@@ -43,7 +43,7 @@ public class ParseJava {
             List<Type> result = new ArrayList<>();
 
 
-            unit.getResult().ifPresent(new Consumer<>() {
+            unit.getResult().ifPresent(new Consumer<CompilationUnit>() {
 
                 ArrayList<String> imports = new ArrayList<>();
 
