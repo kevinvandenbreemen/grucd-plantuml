@@ -59,7 +59,9 @@ public class ParseJava {
                         @Override
                         public void visit(JavadocComment n, VisitorContext classContext) {
                             logger.trace("Found javadoc comment:\n"+n.parse().toText());
-                            classContext.parentType.setClassDoc(n.parse().toText().trim());
+                            if(classContext != null) {   //  Don't attempt this if it's a javadoc comment on a package declaration
+                                classContext.parentType.setClassDoc(n.parse().toText().trim());
+                            }
                             super.visit(n, classContext);
                         }
 

@@ -263,4 +263,14 @@ class JavaParserTest {
         model.unusedTypes[0].name shouldBeEqualTo "StandsAlone"
     }
 
+    @Test
+    fun `should not crash when parsing class with javadoc on package declaration`() {
+        val types = ParseJava().parse("src/test/resources/PackageComment.java");
+
+        val model = ModelBuilder().build(types)
+
+        model.unusedTypes.shouldNotBeEmpty()
+        model.unusedTypes.size shouldBeEqualTo 1
+    }
+
 }
