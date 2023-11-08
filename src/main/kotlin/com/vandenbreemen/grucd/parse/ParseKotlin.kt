@@ -189,39 +189,9 @@ class ParseKotlin {
                             if (declaration.keyword == "val" || declaration.keyword == "var") {
                                 processPropertyDeclaration(declaration, type)
                             } else if (declaration.keyword == "fun") {
-
-                                logger.debug("fun ${declaration.identifier}")
-                                val modifier = getVisibilityModifier(declaration)
-
-                                if (modifier == Visibility.Public) {
-
-                                    val name = declaration.identifier?.rawName ?: ""
-
-
-                                    val returnType = if (declaration.type.isEmpty()) {
-                                        ""
-                                    } else {
-                                        declaration.type[0].rawName
-                                    }
-
-                                    val method = Method(name, returnType)
-                                    declaration.parameter.forEach { methodParam ->
-                                        val parmType = getParameterType(methodParam)
-                                        methodParam.identifier?.let { parameterName ->
-                                            method.addParameter(Parameter(parameterName.rawName, parmType))
-                                        }
-                                    }
-
-                                    type.addMethod(method)
-                                }
+                                handleMemberFunctionDeclaration(declaration, type)
                             } else if (declaration.keyword == "class") {
-                                logger.debug("Found nested class ${declaration.identifier?.rawName}")
-                                declaration.identifier?.rawName?.let { nestedTypeName ->
-                                    val nestedType = Type(nestedTypeName, type.pkg)
-                                    nestedType.parentType = type
-                                    handleClassDeclaration(declaration, nestedType, classList, classCommentOnNextNestedType)
-                                    classList.add(nestedType)
-                                }
+                                handleNestedClassDeclaration(declaration, type, classList, classCommentOnNextNestedType)
                             }
                         }
                     }
@@ -232,6 +202,50 @@ class ParseKotlin {
         }
         finally {
             NDC.pop()
+        }
+    }
+
+    private fun handleNestedClassDeclaration(
+        declaration: KlassDeclaration,
+        type: Type,
+        classList: MutableList<Type>,
+        classCommentOnNextNestedType: String?
+    ) {
+        logger.debug("Found nested class ${declaration.identifier?.rawName}")
+        declaration.identifier?.rawName?.let { nestedTypeName ->
+            val nestedType = Type(nestedTypeName, type.pkg)
+            nestedType.parentType = type
+            handleClassDeclaration(declaration, nestedType, classList, classCommentOnNextNestedType)
+            classList.add(nestedType)
+        }
+    }
+
+    private fun handleMemberFunctionDeclaration(
+        declaration: KlassDeclaration,
+        type: Type
+    ) {
+        logger.debug("fun ${declaration.identifier}")
+        val modifier = getVisibilityModifier(declaration)
+
+        if (modifier == Visibility.Public) {
+
+            val name = declaration.identifier?.rawName ?: ""
+
+            val returnType = if (declaration.type.isEmpty()) {
+                ""
+            } else {
+                declaration.type[0].rawName
+            }
+
+            val method = Method(name, returnType)
+            declaration.parameter.forEach { methodParam ->
+                val parmType = getParameterType(methodParam)
+                methodParam.identifier?.let { parameterName ->
+                    method.addParameter(Parameter(parameterName.rawName, parmType))
+                }
+            }
+
+            type.addMethod(method)
         }
     }
 
