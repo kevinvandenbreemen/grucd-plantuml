@@ -6,6 +6,9 @@ import net.sourceforge.plantuml.SourceStringReader
 import java.io.ByteArrayOutputStream
 import java.nio.charset.Charset
 
+/**
+ * Renders plantuml to svg directly using the Plantuml library rather than an intermediary lib
+ */
 class PlantUmlDirectRenderer {
 
     fun render(source: String): String {
