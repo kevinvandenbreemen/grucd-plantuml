@@ -21,9 +21,6 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.6.0")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
 
-    val javaParserVersion = "3.25.6"
-    implementation("com.github.javaparser:javaparser-symbol-solver-core:$javaParserVersion")
-
     val kluentVersion = "1.68"
     testImplementation("org.amshove.kluent:kluent:$kluentVersion")
 
@@ -37,9 +34,9 @@ dependencies {
     val kevinCommonVersion = "1.0.6.1000"
     implementation("com.github.kevinvandenbreemen:kevin-common:$kevinCommonVersion")
 
-    val kotlinParserVersion = "0.1.0"
-    implementation("com.github.kotlinx.ast:common:$kotlinParserVersion")
-    implementation("com.github.kotlinx.ast:grammar-kotlin-parser-antlr-kotlin:$kotlinParserVersion")
+    val grucdVersion = "1.0.5.1000"
+    implementation("com.github.kevinvandenbreemen:grucd:$grucdVersion")
+    testImplementation("com.github.kevinvandenbreemen:grucd:$grucdVersion")
 
 }
 
