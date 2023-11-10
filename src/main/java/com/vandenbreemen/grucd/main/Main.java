@@ -24,19 +24,29 @@ public class Main {
 
     public static void main(String[] args) {
 
+        generateAndProcessUML(args);
+    }
+
+    /**
+     * Generate and process the UML, writing it to a file if requested.  Use this method if you want to use the resulting
+     * svg
+     * @param args
+     * @return
+     */
+    public static String generateAndProcessUML(String[] args) {
         System.out.println("ARGS:  "+Arrays.asList(args));
 
         new SystemInfo().print();
 
         CommandLineParameters params = new CommandLineParameters(args);
-        params.addRequired("o", "Where to store the resulting class diagram SVG file or script");
+        params.addAtLeast("o", "Where to store the resulting class diagram SVG file or script");
         params.addAtLeast("f", "(or else -d) file you wish to parse and generate UML of");
         params.addAtLeast("d", "(or else -f) directory you wish to parse and generate UML of");
         params.addAtLeast("p", "store plantuml script used to generate diagram to output file but do nothing else");
         params.addAtLeast("u", "Print names of all un-used types or interfaces in the codebase and exit");
         if(!params.validate()) {
             System.out.println(params.document());
-            return;
+            return "Params invalid";
         }
 
         String outputPath = params.getArgument("o");
@@ -94,17 +104,20 @@ public class Main {
                 }
             } catch (Exception ex) {
                 ex.printStackTrace();
-                return;
+                return "Error occurred";
             }
 
-            return;
+            return "";
         } else if (params.flag("u")) {
             System.out.println("UNUSED TYPES IN CODEBASE:\n");
             model.getUnusedTypes().forEach((type -> System.out.println(type)));
-            return;
+            return "";
         }
 
         String svgData = renderer.renderSVG(script);
+        if(outputPath == null) {
+            return svgData;
+        }
 
         try(FileWriter fw = new FileWriter(outputPath)) {
             fw.write(svgData);
@@ -112,6 +125,8 @@ public class Main {
         } catch (IOException ioe) {
             ioe.printStackTrace();
         }
+
+        return "Written out to " + outputPath;
     }
 
 }
