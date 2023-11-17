@@ -34,7 +34,7 @@ dependencies {
     val kevinCommonVersion = "1.0.6.1000"
     implementation("com.github.kevinvandenbreemen:kevin-common:$kevinCommonVersion")
 
-    val grucdVersion = "1.0.5.1000"
+    val grucdVersion = "1.0.6.2000"
     implementation("com.github.kevinvandenbreemen:grucd:$grucdVersion")
     testImplementation("com.github.kevinvandenbreemen:grucd:$grucdVersion")
 

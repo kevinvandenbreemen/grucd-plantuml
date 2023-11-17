@@ -1,6 +1,7 @@
 package com.vandenbreemen.grucd.main;
 
 import com.vandenbreemen.grucd.builder.ModelBuilder;
+import com.vandenbreemen.grucd.builder.SourceCodeExtractor;
 import com.vandenbreemen.grucd.doc.SystemInfo;
 import com.vandenbreemen.grucd.model.Model;
 import com.vandenbreemen.grucd.model.Type;
@@ -10,6 +11,7 @@ import com.vandenbreemen.grucd.render.plantuml.PlantUMLRenderer;
 import com.vandenbreemen.grucd.render.plantuml.PlantUMLScriptGenerator;
 import com.vandenbreemen.kevincommon.cmd.CommandLineParameters;
 import org.apache.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -53,44 +55,13 @@ public class Main {
         String inputFile = params.getArgument("f");
         String inputDir = params.getArgument("d");
 
-        List<String> filesToVisit = new ArrayList<>();
-        if(inputFile != null) {
-            logger.info("Parsing single file '"+inputFile+"'");
-            filesToVisit.add(inputFile);
-        } else {
-            logger.info("Parsing directory "+inputDir);
-            try {
-                Files.walk(Paths.get(inputDir)).filter((filePath)->{return filePath.getFileName().toString().endsWith(".java");}).forEach(path -> {
-                    logger.debug("path (java)="+path.toFile().getAbsolutePath());
-                    filesToVisit.add(path.toFile().getAbsolutePath());
-                });
-                Files.walk(Paths.get(inputDir)).filter((filePath)->{return filePath.getFileName().toString().endsWith(".kt");}).forEach(path -> {
-                    logger.debug("path (kotlin)="+path.toFile().getAbsolutePath());
-                    filesToVisit.add(path.toFile().getAbsolutePath());
-                });
-            } catch (IOException ioe) {
-                logger.error("Failed to get files to parse", ioe);
-            }
-        }
-
-        ParseJava java = new ParseJava();
-        ParseKotlin kotlin = new ParseKotlin();
-
-        List<Type> allTypes = new ArrayList<>();
-
-        filesToVisit.forEach(file->{
-            if(file.endsWith(".java")) {
-                allTypes.addAll(java.parse(file));
-            } else if(file.endsWith(".kt")) {
-                allTypes.addAll(kotlin.parse(file));
-            }
-        });
+        SourceCodeExtractor sourceCodeExtractor = new SourceCodeExtractor();
+        List<String> filesToVisit = sourceCodeExtractor.getFilenamesToVisit(inputFile, inputDir == null ? "" : inputDir);
 
 
         PlantUMLRenderer renderer = new PlantUMLRenderer();
-        ModelBuilder modelBuilder = new ModelBuilder();
 
-        Model model = modelBuilder.build(allTypes);
+        Model model = sourceCodeExtractor.buildModelWithFiles(filesToVisit);
 
         PlantUMLScriptGenerator generator = new PlantUMLScriptGenerator();
         String script = generator.render(model);
